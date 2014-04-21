@@ -1,8 +1,6 @@
 import org.opencv.core.*;
+import utillities.Optional;
 import utillities.Utilities;
-
-import static org.opencv.imgproc.Imgproc.TM_CCORR_NORMED;
-import static org.opencv.imgproc.Imgproc.matchTemplate;
 
 public class Main
 {
@@ -11,19 +9,36 @@ public class Main
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
         Mat image = Utilities.readImage("/1.jpg");
-        Mat template = Utilities.readImage("/lips.jpg");
+        Mat template = Utilities.readImage("/lips_rotated.jpg");
 
-        int result_cols = image.cols() - template.cols() + 1;
-        int result_rows = image.rows() - template.rows() + 1;
-        Mat result = new Mat(result_rows, result_cols, CvType.CV_32FC1);
+        Optional<Point> matchingPoint = TemplateMatcher.instance.findBestMatching(image, template);
+        int numOfDirectionsTested = 1;
+        
+        Mat rotatedTemplate = template;
+        
+        while (!matchingPoint.isPresent() && numOfDirectionsTested <= 4)
+        {
+            rotatedTemplate = ImageRotator.instance.rotateToLeft(rotatedTemplate);
 
-        matchTemplate(image, template, result, TM_CCORR_NORMED);
+            matchingPoint = TemplateMatcher.instance.findBestMatching(image, rotatedTemplate);
 
-        Core.MinMaxLocResult minMaxLocResult = Core.minMaxLoc(result);
-
-        Point maxLocation = minMaxLocResult.maxLoc;
-        Utilities.drawRect(new Rect(maxLocation, new Size(template.cols(), template.rows())), image);
-
-        Utilities.writeImageToFile(image, "match.jpg");
+            numOfDirectionsTested++;
+        }
+        
+        if (matchingPoint.isPresent())
+        {
+            if (numOfDirectionsTested % 2 == 0)
+            {
+                Utilities.drawRectAndStore(new Rect(matchingPoint.get(), new Size(template.rows(), template.cols())), image, "match.jpg");
+            }
+            else
+            {
+                Utilities.drawRectAndStore(new Rect(matchingPoint.get(), new Size(template.cols(), template.rows())), image, "match.jpg");
+            }
+        }
+        else
+        {
+            throw new RuntimeException("Match not found!");
+        }
     }
 }
