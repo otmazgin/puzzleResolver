@@ -5,11 +5,10 @@ import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Size;
 import utillities.Optional;
-import utillities.Utilities;
 
 import java.util.concurrent.Callable;
 
-class PuzzlePieceAssembler implements Callable<Point>
+class PuzzlePieceAssembler implements Callable<Rect>
 {
     private final Mat puzzlePiece;
     private final Mat puzzle;
@@ -21,7 +20,7 @@ class PuzzlePieceAssembler implements Callable<Point>
     }
 
     @Override
-    public Point call() throws Exception
+    public Rect call() throws Exception
     {
         Optional<Point> matchingPoint = TemplateMatcher.instance.findBestMatching(puzzle, puzzlePiece);
         int numOfDirectionsTested = 1;
@@ -41,22 +40,20 @@ class PuzzlePieceAssembler implements Callable<Point>
         {
             if (numOfDirectionsTested % 2 == 0)
             {
-                Utilities.drawRectAndStore(new Rect(matchingPoint.get(), new Size(puzzlePiece.rows(), puzzlePiece.cols())), puzzle, "match.jpg");
+                return new Rect(matchingPoint.get(), new Size(puzzlePiece.rows(), puzzlePiece.cols()));
             }
             else
             {
-                Utilities.drawRectAndStore(new Rect(matchingPoint.get(), new Size(puzzlePiece.cols(), puzzlePiece.rows())), puzzle, "match.jpg");
+                return new Rect(matchingPoint.get(), new Size(puzzlePiece.cols(), puzzlePiece.rows()));
             }
         }
         else
         {
             throw new RuntimeException("Match not found!");
         }
-
-        return matchingPoint.get();
     }
 
-    static Callable<Point> createAssembler(Mat puzzlePiece, Mat puzzle)
+    static Callable<Rect> createAssembler(Mat puzzlePiece, Mat puzzle)
     {
         return new PuzzlePieceAssembler(puzzlePiece, puzzle);
     }

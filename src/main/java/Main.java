@@ -13,10 +13,19 @@ public class Main
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
         Mat image = Utilities.readImage("/1.jpg");
-        Mat template = Utilities.readImage("/lips_rotated.jpg");
+        Mat lips = Utilities.readImage("/lips.jpg");
+        Mat leftEye = Utilities.readImage("/leftEye.jpg");
+        Mat nose = Utilities.readImage("/nose.jpg");
+        Mat hair = Utilities.readImage("/hair.jpg");
+        Mat dash = Utilities.readImage("/dash.jpg");
 
         List<Mat> puzzlePieces = new ArrayList<>();
-        puzzlePieces.add(template);
+        puzzlePieces.add(lips);
+        puzzlePieces.add(leftEye);
+        puzzlePieces.add(nose);
+        puzzlePieces.add(hair);
+        puzzlePieces.add(lips);
+        puzzlePieces.add(dash);
 
         PuzzleAssembler.instance.assemblePieces(puzzlePieces, image);
     }

@@ -28,7 +28,9 @@ enum TemplateMatcher
     {
         Core.MinMaxLocResult minMaxLocResult = Core.minMaxLoc(result);
 
-        if (minMaxLocResult.maxVal > 0.999)
+        System.out.println(minMaxLocResult.maxVal);
+
+        if (minMaxLocResult.maxVal > 0.99)
         {
             return Optional.of(minMaxLocResult.maxLoc);
         }
