@@ -1,6 +1,10 @@
-import org.opencv.core.*;
-import utillities.Optional;
+import assembler.PuzzleAssembler;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
 import utillities.Utilities;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main
 {
@@ -11,34 +15,9 @@ public class Main
         Mat image = Utilities.readImage("/1.jpg");
         Mat template = Utilities.readImage("/lips_rotated.jpg");
 
-        Optional<Point> matchingPoint = TemplateMatcher.instance.findBestMatching(image, template);
-        int numOfDirectionsTested = 1;
-        
-        Mat rotatedTemplate = template;
-        
-        while (!matchingPoint.isPresent() && numOfDirectionsTested <= 4)
-        {
-            rotatedTemplate = ImageRotator.instance.rotateToLeft(rotatedTemplate);
+        List<Mat> puzzlePieces = new ArrayList<>();
+        puzzlePieces.add(template);
 
-            matchingPoint = TemplateMatcher.instance.findBestMatching(image, rotatedTemplate);
-
-            numOfDirectionsTested++;
-        }
-        
-        if (matchingPoint.isPresent())
-        {
-            if (numOfDirectionsTested % 2 == 0)
-            {
-                Utilities.drawRectAndStore(new Rect(matchingPoint.get(), new Size(template.rows(), template.cols())), image, "match.jpg");
-            }
-            else
-            {
-                Utilities.drawRectAndStore(new Rect(matchingPoint.get(), new Size(template.cols(), template.rows())), image, "match.jpg");
-            }
-        }
-        else
-        {
-            throw new RuntimeException("Match not found!");
-        }
+        PuzzleAssembler.instance.assemblePieces(puzzlePieces, image);
     }
 }

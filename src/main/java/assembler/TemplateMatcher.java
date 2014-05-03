@@ -1,3 +1,5 @@
+package assembler;
+
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -7,11 +9,11 @@ import utillities.Optional;
 import static org.opencv.imgproc.Imgproc.TM_CCORR_NORMED;
 import static org.opencv.imgproc.Imgproc.matchTemplate;
 
-public enum TemplateMatcher
+enum TemplateMatcher
 {
     instance;
 
-    public Optional<Point> findBestMatching(Mat image, Mat template)
+    Optional<Point> findBestMatching(Mat image, Mat template)
     {
         int result_cols = image.cols() - template.cols() + 1;
         int result_rows = image.rows() - template.rows() + 1;

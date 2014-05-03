@@ -1,13 +1,15 @@
+package assembler;
+
 import org.opencv.core.Mat;
 
 import static org.opencv.core.Core.flip;
 import static org.opencv.core.Core.transpose;
 
-public enum ImageRotator
+enum ImageRotator
 {
     instance;
 
-    public Mat rotateToLeft(Mat template)
+    Mat rotateToLeft(Mat template)
     {
         Mat rotatedTemplate = new Mat();
 
