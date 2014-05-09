@@ -29,7 +29,7 @@ class PuzzlePieceAssembler implements Callable<Rect>
 
         while (!matchingPoint.isPresent() && numOfDirectionsTested <= 4)
         {
-            rotatedPuzzlePiece = ImageRotator.instance.rotateToLeft(rotatedPuzzlePiece);
+            rotatedPuzzlePiece = ImageRotator.instance.rotateLeft(rotatedPuzzlePiece);
 
             matchingPoint = TemplateMatcher.instance.findBestMatching(puzzle, rotatedPuzzlePiece);
 

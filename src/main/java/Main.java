@@ -14,6 +14,7 @@ public class Main
 
         Mat image = Utilities.readImage("/1.jpg");
         Mat lips = Utilities.readImage("/lips.jpg");
+        Mat rotatedLips = Utilities.readImage("/lips_rotated.jpg");
         Mat leftEye = Utilities.readImage("/leftEye.jpg");
         Mat nose = Utilities.readImage("/nose.jpg");
         Mat hair = Utilities.readImage("/hair.jpg");
@@ -26,6 +27,7 @@ public class Main
         puzzlePieces.add(hair);
         puzzlePieces.add(lips);
         puzzlePieces.add(dash);
+        puzzlePieces.add(rotatedLips);
 
         PuzzleAssembler.instance.assemblePieces(puzzlePieces, image);
     }

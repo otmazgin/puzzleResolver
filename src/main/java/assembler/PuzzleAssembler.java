@@ -15,11 +15,13 @@ public enum PuzzleAssembler
 {
     instance;
 
+    private static final int numberOfCPUCores = 4;
+
     public void assemblePieces(Collection<Mat> puzzlePieces, Mat puzzle)
     {
         System.out.println("Started assembling at: " + new Date());
 
-        ExecutorService executorService = Executors.newFixedThreadPool(Math.min(puzzlePieces.size(), 100));
+        ExecutorService executorService = Executors.newFixedThreadPool(numberOfCPUCores);
 
         Collection<Future<Rect>> futures = new ArrayList<>();
 

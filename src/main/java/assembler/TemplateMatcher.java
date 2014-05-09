@@ -6,6 +6,8 @@ import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import utillities.Optional;
 
+import java.util.Date;
+
 import static org.opencv.imgproc.Imgproc.TM_CCORR_NORMED;
 import static org.opencv.imgproc.Imgproc.matchTemplate;
 
@@ -27,8 +29,6 @@ enum TemplateMatcher
     private Optional<Point> getMatchingPoint(Mat result)
     {
         Core.MinMaxLocResult minMaxLocResult = Core.minMaxLoc(result);
-
-        System.out.println(minMaxLocResult.maxVal);
 
         if (minMaxLocResult.maxVal > 0.99)
         {
