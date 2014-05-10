@@ -2,36 +2,36 @@ package pieceRecognizer;
 
 public class Corner implements Comparable<Corner>
 {
-    private int i;
-    private int j;
+    private int x;
+    private int y;
     private double grade;
 
-    public Corner(int i, int j, double grade)
+    public Corner(int x, int y, double grade)
     {
         super();
-        this.i = i;
-        this.j = j;
+        this.x = x;
+        this.y = y;
         this.grade = grade;
     }
 
-    public int getI()
+    public int getX()
     {
-        return i;
+        return x;
     }
 
-    public void setI(int i)
+    public void setX(int x)
     {
-        this.i = i;
+        this.x = x;
     }
 
-    public int getJ()
+    public int getY()
     {
-        return j;
+        return y;
     }
 
-    public void setJ(int j)
+    public void setY(int y)
     {
-        this.j = j;
+        this.y = y;
     }
 
     public double getGrade()
@@ -52,8 +52,8 @@ public class Corner implements Comparable<Corner>
         long temp;
         temp = Double.doubleToLongBits(grade);
         result = prime * result + (int) (temp ^ (temp >>> 32));
-        result = prime * result + i;
-        result = prime * result + j;
+        result = prime * result + x;
+        result = prime * result + y;
         return result;
     }
 
@@ -70,9 +70,9 @@ public class Corner implements Comparable<Corner>
         if (Double.doubleToLongBits(grade) != Double
                 .doubleToLongBits(other.grade))
             return false;
-        if (i != other.i)
+        if (x != other.x)
             return false;
-        if (j != other.j)
+        if (y != other.y)
             return false;
         return true;
     }

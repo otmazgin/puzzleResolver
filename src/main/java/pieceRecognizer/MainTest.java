@@ -13,10 +13,11 @@ import com.atul.JavaOpenCV.Imshow;
 
 public class MainTest {
     public static void main(String args[]) {
-	Properties prop = new Properties();
+
+	System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 	try {
+	    Properties prop = new Properties();
 	    // load a properties file from class path, inside static method
-	    System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 	    prop.load(new FileInputStream("parameterFile.txt"));
 
 	    int hueMin = Integer.parseInt(prop.getProperty("background_h_min"));
@@ -33,28 +34,29 @@ public class MainTest {
 	    String filePath = (prop.getProperty("src_pic"));
 	    Mat src = Highgui.imread(filePath);
 
-	    List<PuzzlePiece> Pieces = PuzzlePieceDetector.pieceDetector(src, hueMin, saturationMin, valueMin,
-		    hueMax, saturationMax, valueMax);
+	    List<PuzzlePiece> pieces = PuzzlePieceDetector.pieceDetector(src, hueMin, saturationMin,
+		    valueMin, hueMax, saturationMax, valueMax);
 
-	    for (int i = 0; i < Pieces.size(); i++) {
-
+	    for (PuzzlePiece puzzlePiece : pieces) {
 		PuzzlePieceCornerDetector.cornerFindeByQuaters(harisBlockSize, harisApertureSize, harisK,
-			harisThreashHold, Pieces.get(i).getMask(), Pieces.get(i).getRect(), new Mat(), Pieces
-				.get(i).getCornersList()); /*
-							    * PuzzelPiceCornerDetector.corner_finder(
-							    * Haris_blockSize , Haris_apertureSize, Haris_k ,
-							    * Haris_threashHold, Pices.get(i).getMask(), new
-							    * Mat() , Pices.get(i).getCornersList());
-							    */
+			harisThreashHold, puzzlePiece);
+
+		/*
+		 * PuzzelPiceCornerDetector.corner_finder( Haris_blockSize , Haris_apertureSize, Haris_k ,
+		 * Haris_threashHold, Pices.get(i).getMask(), new Mat() , Pices.get(i).getCornersList());
+		 */
+
 	    }
 
 	    Imshow im = new Imshow("Title");
 	    Mat satImg = new Mat(src.size(), src.type());
 
-	    for (int i = 0; i < Pieces.size(); i++) {
-		Pieces.get(i).drawPice(satImg);
-		Pieces.get(i).drawCorners(satImg);
+	    for (PuzzlePiece puzzlePiece : pieces) {
+		puzzlePiece.drawPiece(satImg);
+		puzzlePiece.drawCorners(satImg);
+
 	    }
+
 	    im.showImage(satImg);
 
 	} catch (IOException ex) {

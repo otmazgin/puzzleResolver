@@ -38,14 +38,14 @@ public class PuzzlePiece {
 	this.cornersList = new ArrayList<Corner>();
     }
 
-    public void drawPice(Mat drawing) {
+    public void drawPiece(Mat drawing) {
 	Imgproc.drawContours(drawing, getcontoures(), getContoureNum(), wColor, -1, 1, getHierarchy(), 0,
 		new Point());
     }
 
     public void drawCorners(Mat drawing) {
 	for (int i = 0; i < getCornersList().size(); i++) {
-	    Core.circle(drawing, new Point(getCornersList().get(i).getI(), getCornersList().get(i).getJ()),
+	    Core.circle(drawing, new Point(getCornersList().get(i).getX(), getCornersList().get(i).getY()),
 		    5, new Scalar(Math.random() * 255), 1, 8, 0);
 	}
     }

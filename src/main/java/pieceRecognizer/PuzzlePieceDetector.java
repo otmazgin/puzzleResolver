@@ -1,7 +1,6 @@
 package pieceRecognizer;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.opencv.core.Core;
@@ -23,30 +22,29 @@ public class PuzzlePieceDetector {
 	Imgproc.cvtColor(srcImage, srcGray, Imgproc.COLOR_RGB2HSV);
 	Core.inRange(srcGray, new Scalar(hueMin, saturationMin, valueMin), new Scalar(hueMax, saturationMax,
 		valueMax), srcGray);
-	Mat tmp = new Mat();
-	srcGray.copyTo(tmp);
+	Mat tmp = srcGray.clone();
 	tmp.setTo(new Scalar(255, 255, 255));
 
 	Core.subtract(tmp, srcGray, srcGray);
 
 	Mat hierarchy = new Mat();
-	List<MatOfPoint> contours = new LinkedList<>();
+	List<MatOfPoint> contours = new ArrayList<>();
 
 	Imgproc.findContours(srcGray, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE,
 		new Point(0, 0));
 
-	int max_area = 1;
+	int maxArea = 1;
 	for (MatOfPoint contour : contours) {
 	    int area = (int) Imgproc.boundingRect(contour).area();
-	    if (area > max_area) {
-		max_area = area;
+	    if (area > maxArea) {
+		maxArea = area;
 	    }
 	}
 
 	for (int i = 0; i < contours.size(); i++) {
 	    Rect rect = Imgproc.boundingRect(contours.get(i));
 
-	    if (rect.area() > (max_area / 2)) {
+	    if (rect.area() > (maxArea / 2)) {
 		detectedPieces.add(new PuzzlePiece(srcImage, contours, hierarchy, i));
 
 	    }
