@@ -20,9 +20,9 @@ public enum AffineTransformator {
      * @param dstImage
      *            - output image
      * @param srcPoints
-     *            - points in the <code>srcImg</code> to be correlated to <code>dstPoints</code>
+     *            - 3 points in the <code>srcImg</code> to be correlated to <code>dstPoints</code>
      * @param dstPoints
-     *            - points in the <code>dstImg</code> to be correlated by <code>srcPoints</code>
+     *            - 3 points in the <code>dstImg</code> to be correlated by <code>srcPoints</code>
      * @return <code>dstImg</code>
      */
     public Mat transform(Mat srcImage, Mat dstImage, List<Point> srcPoints, List<Point> dstPoints) {

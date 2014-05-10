@@ -1,5 +1,6 @@
 package pieceRecognizer;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -12,12 +13,16 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
 public class PuzzlePieceDetector {
-    public static void pieceDetector(Mat src, int h_min, int s_min, int v_min, int h_max, int s_max,
-	    int v_max, List<PuzzlePiece> Pieces) {
+
+    public static List<PuzzlePiece> pieceDetector(Mat srcImage, int hueMin, int saturationMin, int valueMin,
+	    int hueMax, int saturationMax, int valueMax) {
+
+	List<PuzzlePiece> detectedPieces = new ArrayList<PuzzlePiece>();
 	Mat srcGray = new Mat();
 
-	Imgproc.cvtColor(src, srcGray, Imgproc.COLOR_RGB2HSV);
-	Core.inRange(srcGray, new Scalar(h_min, s_min, v_min), new Scalar(h_max, s_max, v_max), srcGray);
+	Imgproc.cvtColor(srcImage, srcGray, Imgproc.COLOR_RGB2HSV);
+	Core.inRange(srcGray, new Scalar(hueMin, saturationMin, valueMin), new Scalar(hueMax, saturationMax,
+		valueMax), srcGray);
 	Mat tmp = new Mat();
 	srcGray.copyTo(tmp);
 	tmp.setTo(new Scalar(255, 255, 255));
@@ -42,9 +47,11 @@ public class PuzzlePieceDetector {
 	    Rect rect = Imgproc.boundingRect(contours.get(i));
 
 	    if (rect.area() > (max_area / 2)) {
-		Pieces.add(new PuzzlePiece(src, contours, hierarchy, i));
+		detectedPieces.add(new PuzzlePiece(srcImage, contours, hierarchy, i));
 
 	    }
 	}
+
+	return detectedPieces;
     }
 }
