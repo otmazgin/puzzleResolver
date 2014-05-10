@@ -1,0 +1,11 @@
+background_h_min=70
+background_s_min=100
+background_v_min=150
+background_h_max=80
+background_s_max=255
+background_v_max=255
+Haris_apertureSize=5
+Haris_k=0.05
+Haris_blockSize=2
+Haris_threashHold=0
+src_pic=test6.jpg
