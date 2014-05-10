@@ -17,7 +17,7 @@ public enum PuzzleAssembler
 
     private static final int numberOfCPUCores = 4;
 
-    public void assemblePieces(Collection<Mat> puzzlePieces, Mat puzzle)
+    public void assemblePieces(Collection<Mat> puzzlePieces, Mat puzzle, double[] backgroundColor)
     {
         System.out.println("Started assembling at: " + new Date());
 
@@ -27,7 +27,7 @@ public enum PuzzleAssembler
 
         for (Mat puzzlePiece : puzzlePieces)
         {
-            futures.add(executorService.submit(PuzzlePieceAssembler.createAssembler(puzzlePiece, puzzle)));
+            futures.add(executorService.submit(PuzzlePieceAssembler.createAssembler(puzzlePiece, puzzle, backgroundColor)));
         }
 
         executorService.shutdown();

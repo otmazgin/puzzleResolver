@@ -1,4 +1,5 @@
 import assembler.PuzzleAssembler;
+import assembler.PuzzlePieceRestorer;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import utillities.Utilities;
@@ -6,10 +7,8 @@ import utillities.Utilities;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.opencv.imgproc.Imgproc.COLOR_RGB2GRAY;
 import static org.opencv.imgproc.Imgproc.cvtColor;
-import static org.opencv.photo.Photo.INPAINT_TELEA;
-import static org.opencv.photo.Photo.inpaint;
+import static org.opencv.imgproc.Imgproc.integral;
 
 public class Main
 {
@@ -38,33 +37,9 @@ public class Main
         puzzlePieces.add(dash);
         puzzlePieces.add(rotatedLips);
 */
-        inpaintPuzzlePieceHoles(eyePiece);
         puzzlePieces.add(eyePiece);
 
-       PuzzleAssembler.instance.assemblePieces(puzzlePieces, image);
-    }
-
-    public static void inpaintPuzzlePieceHoles(Mat puzzlePiece)
-    {
-        Mat maskOfGaps = new Mat();
-        cvtColor(puzzlePiece, maskOfGaps, COLOR_RGB2GRAY);
-
-        for (int row = 0; row < puzzlePiece.rows(); row++)
-        {
-            for (int column = 0; column < puzzlePiece.cols(); column++)
-            {
-                if (maskOfGaps.get(row, column)[0]>200)
-                {
-                    maskOfGaps.put(row, column, 1);
-                }
-                else
-                {
-                    maskOfGaps.put(row, column, 0);
-                }
-            }
-        }
-
-        inpaint(puzzlePiece, maskOfGaps, puzzlePiece, 1, INPAINT_TELEA);
-        Utilities.writeImageToFile(puzzlePiece, "inpainted.jpg");
+        double[] backgroundColor = {255, 255, 255};
+        PuzzleAssembler.instance.assemblePieces(puzzlePieces, image, backgroundColor);
     }
 }
