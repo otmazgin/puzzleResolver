@@ -1,14 +1,10 @@
 import assembler.PuzzleAssembler;
-import assembler.PuzzlePieceRestorer;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import utillities.Utilities;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.opencv.imgproc.Imgproc.cvtColor;
-import static org.opencv.imgproc.Imgproc.integral;
 
 public class Main
 {
