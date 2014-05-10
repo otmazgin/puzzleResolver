@@ -9,13 +9,13 @@ import java.awt.*;
 import static org.opencv.photo.Photo.INPAINT_TELEA;
 import static org.opencv.photo.Photo.inpaint;
 
-public enum PuzzlePieceRestorer
+enum PuzzlePieceRestorer
 {
     instance;
 
     private static final int distanceFromBackgroundColorThreshold = 5;
 
-    public void restoreMissingGaps2(Mat puzzlePiece, double[] backgroundColor)
+    void restoreMissingGaps2(Mat puzzlePiece, double[] backgroundColor)
     {
         Mat maskOfGaps = new Mat(puzzlePiece.size(), CvType.CV_8U);
 
