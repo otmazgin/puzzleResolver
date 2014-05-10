@@ -1,10 +1,10 @@
 package assembler;
 
-import org.opencv.core.CvType;
-import org.opencv.core.Mat;
+import org.opencv.core.*;
 import utillities.Utilities;
 
 import java.awt.*;
+import java.awt.Point;
 
 import static org.opencv.photo.Photo.INPAINT_TELEA;
 import static org.opencv.photo.Photo.inpaint;
@@ -15,7 +15,7 @@ enum PuzzlePieceRestorer
 
     private static final int distanceFromBackgroundColorThreshold = 5;
 
-    void restoreMissingGaps2(Mat puzzlePiece, double[] backgroundColor)
+    private void restoreMissingGaps2(Mat puzzlePiece, double[] backgroundColor)
     {
         Mat maskOfGaps = new Mat(puzzlePiece.size(), CvType.CV_8U);
 
@@ -40,7 +40,7 @@ enum PuzzlePieceRestorer
 
     }
 
-    private void restoreMissingGaps(Mat puzzlePiece, double[] backgroundColor)
+    void restoreMissingGaps(Mat puzzlePiece, double[] backgroundColor)
     {
         Mat maskOfGaps = new Mat(puzzlePiece.size(), CvType.CV_8U);
 
@@ -56,6 +56,8 @@ enum PuzzlePieceRestorer
 
     private void inpaintLeftMiddleSuspectedGap(Mat puzzlePiece, double[] backgroundColor, Mat maskOfGaps)
     {
+        //Utilities.drawPoint(new org.opencv.core.Point(10, puzzlePiece.height() / 2), puzzlePiece);
+
         if (euclideanDistance(puzzlePiece.get(puzzlePiece.height() / 2, 10), backgroundColor) <= distanceFromBackgroundColorThreshold)
         {
             inpaintGapIfExists(puzzlePiece, maskOfGaps, new Point(0, puzzlePiece.height() / 4), backgroundColor);
@@ -64,6 +66,8 @@ enum PuzzlePieceRestorer
 
     private void inpaintUpMiddleSuspectedGap(Mat puzzlePiece, double[] backgroundColor, Mat maskOfGaps)
     {
+        //Utilities.drawPoint(new org.opencv.core.Point(puzzlePiece.height() / 2, 10), puzzlePiece);
+
         if (euclideanDistance(puzzlePiece.get(10, puzzlePiece.width() / 2), backgroundColor) <= distanceFromBackgroundColorThreshold)
         {
             inpaintGapIfExists(puzzlePiece, maskOfGaps, new Point(puzzlePiece.width() / 4, 0), backgroundColor);
@@ -72,6 +76,8 @@ enum PuzzlePieceRestorer
 
     private void inpaintDownMiddleSuspectedGap(Mat puzzlePiece, double[] backgroundColor, Mat maskOfGaps)
     {
+        //Utilities.drawPoint(new org.opencv.core.Point(puzzlePiece.width() / 2, puzzlePiece.height() - 10), puzzlePiece);
+
         if (euclideanDistance(puzzlePiece.get(puzzlePiece.height() - 10, puzzlePiece.width() / 2), backgroundColor) <= distanceFromBackgroundColorThreshold)
         {
             inpaintGapIfExists(puzzlePiece, maskOfGaps, new Point(puzzlePiece.width() / 4, puzzlePiece.height() / 2), backgroundColor);
@@ -80,6 +86,8 @@ enum PuzzlePieceRestorer
 
     private void inpaintRightMiddleSuspectedGap(Mat puzzlePiece, double[] backgroundColor, Mat maskOfGaps)
     {
+        //Utilities.drawPoint(new org.opencv.core.Point(puzzlePiece.width() - 10, puzzlePiece.height() / 2), puzzlePiece);
+
         if (euclideanDistance(puzzlePiece.get(puzzlePiece.height() / 2, puzzlePiece.width() - 10), backgroundColor) <= distanceFromBackgroundColorThreshold)
         {
             inpaintGapIfExists(puzzlePiece, maskOfGaps, new Point(puzzlePiece.width() / 2, puzzlePiece.height() / 4), backgroundColor);
@@ -88,11 +96,13 @@ enum PuzzlePieceRestorer
 
     private void inpaintGapIfExists(Mat puzzlePiece, Mat maskOfGaps, Point suspectedGapStart, double[] backgroundColor)
     {
+        //Utilities.drawRect(new Rect(suspectedGapStart.x, suspectedGapStart.y, puzzlePiece.width() / 2, puzzlePiece.height() / 2), puzzlePiece);
+
         for (int row = suspectedGapStart.y; row < suspectedGapStart.y + puzzlePiece.height() / 2; row++)
         {
             for (int column = suspectedGapStart.x; column < suspectedGapStart.x + puzzlePiece.width() / 2; column++)
             {
-                if (euclideanDistance(puzzlePiece.get(row, column), backgroundColor) < 50)
+                if (euclideanDistance(puzzlePiece.get(row, column), backgroundColor) < 70)
                 {
                     maskOfGaps.put(row, column, 1);
                 } else

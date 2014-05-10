@@ -24,7 +24,7 @@ class PuzzlePieceAssembler implements Callable<Rect>
     @Override
     public Rect call() throws Exception
     {
-        PuzzlePieceRestorer.instance.restoreMissingGaps2(puzzlePiece, backgroundColor);
+        PuzzlePieceRestorer.instance.restoreMissingGaps(puzzlePiece, backgroundColor);
 
         Optional<Point> matchingPoint = TemplateMatcher.instance.findBestMatching(puzzle, puzzlePiece);
 
