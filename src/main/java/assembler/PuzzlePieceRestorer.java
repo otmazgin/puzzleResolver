@@ -1,10 +1,10 @@
 package assembler;
 
-import org.opencv.core.*;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
 import utillities.Utilities;
 
 import java.awt.*;
-import java.awt.Point;
 
 import static org.opencv.photo.Photo.INPAINT_TELEA;
 import static org.opencv.photo.Photo.inpaint;
@@ -14,31 +14,6 @@ enum PuzzlePieceRestorer
     instance;
 
     private static final int distanceFromBackgroundColorThreshold = 5;
-
-    private void restoreMissingGaps2(Mat puzzlePiece, double[] backgroundColor)
-    {
-        Mat maskOfGaps = new Mat(puzzlePiece.size(), CvType.CV_8U);
-
-        for (int row = 0; row < puzzlePiece.height(); row++)
-        {
-            for (int column = 0; column < puzzlePiece.width(); column++)
-            {
-                if (euclideanDistance(puzzlePiece.get(row, column), backgroundColor) < 70)
-                {
-                    maskOfGaps.put(row, column, 1);
-                }
-                else
-                {
-                    maskOfGaps.put(row, column, 0);
-                }
-            }
-        }
-
-        inpaint(puzzlePiece, maskOfGaps, puzzlePiece, 1, INPAINT_TELEA);
-
-        Utilities.writeImageToFile(puzzlePiece, "inpainted.jpg");
-
-    }
 
     void restoreMissingGaps(Mat puzzlePiece, double[] backgroundColor)
     {
@@ -127,5 +102,30 @@ enum PuzzlePieceRestorer
         }
 
         return Math.sqrt(sumSquares);
+    }
+
+    private void restoreMissingGaps2(Mat puzzlePiece, double[] backgroundColor)
+    {
+        Mat maskOfGaps = new Mat(puzzlePiece.size(), CvType.CV_8U);
+
+        for (int row = 0; row < puzzlePiece.height(); row++)
+        {
+            for (int column = 0; column < puzzlePiece.width(); column++)
+            {
+                if (euclideanDistance(puzzlePiece.get(row, column), backgroundColor) < 70)
+                {
+                    maskOfGaps.put(row, column, 1);
+                }
+                else
+                {
+                    maskOfGaps.put(row, column, 0);
+                }
+            }
+        }
+
+        inpaint(puzzlePiece, maskOfGaps, puzzlePiece, 1, INPAINT_TELEA);
+
+        Utilities.writeImageToFile(puzzlePiece, "inpainted.jpg");
+
     }
 }
