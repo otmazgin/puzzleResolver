@@ -14,14 +14,29 @@ import org.opencv.imgproc.Imgproc;
 public class PuzzlePieceDetector {
 
     public static List<PuzzlePiece> pieceDetector(Mat srcImage, int hueMin, int saturationMin, int valueMin,
-	    int hueMax, int saturationMax, int valueMax) {
+	    int hueMax, int saturationMax, int valueMax, boolean auto) {
 
 	List<PuzzlePiece> detectedPieces = new ArrayList<PuzzlePiece>();
 	Mat srcGray = new Mat();
 
 	Imgproc.cvtColor(srcImage, srcGray, Imgproc.COLOR_RGB2HSV);
-	Core.inRange(srcGray, new Scalar(hueMin, saturationMin, valueMin), new Scalar(hueMax, saturationMax,
-		valueMax), srcGray);
+	byte[] data = new byte[3];
+
+	
+	srcGray.get(0, 0, data);
+	System.out.print(data[0] +" " +  data[1] +" "+ data [2]);
+	
+	if (!auto)
+	Core.inRange(srcGray, new Scalar(hueMin, saturationMin,valueMin ), new Scalar(hueMax, saturationMax,
+			valueMax), srcGray);
+	else
+	{
+		int hue = (data[0] & 0xFF);
+		int saturation = (data[1] & 0xFF);
+		int value = (data[2] & 0xFF);
+	Core.inRange(srcGray, new Scalar(hue-10, saturation-20, 0), new Scalar(hue+10, saturation+40,
+				255), srcGray);
+	}
 	Mat tmp = srcGray.clone();
 	tmp.setTo(new Scalar(255, 255, 255));
 

@@ -92,7 +92,7 @@ public class PuzzlePieceCornerDetector {
 	    Core.rectangle(satImg, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y
 		    + rect.height), new Scalar(255, 0, 0, 255), 1);
 
-	    im.showImage(satImg);
+	 //   im.showImage(satImg);
 
 	    isRect = isRect(corners);
 	    blockSize = blockSize * 2;

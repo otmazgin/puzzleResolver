@@ -31,11 +31,13 @@ public class MainTest {
 	    double harisK = Double.parseDouble(prop.getProperty("Haris_k"));
 	    int harisBlockSize = Integer.parseInt(prop.getProperty("Haris_blockSize"));
 	    int harisThreashHold = Integer.parseInt(prop.getProperty("Haris_threashHold"));
+	    boolean auto_color_detect = Boolean.parseBoolean(prop.getProperty("auto_color_detect"));
+
 	    String filePath = (prop.getProperty("src_pic"));
 	    Mat src = Highgui.imread(filePath);
 
 	    List<PuzzlePiece> pieces = PuzzlePieceDetector.pieceDetector(src, hueMin, saturationMin,
-		    valueMin, hueMax, saturationMax, valueMax);
+		    valueMin, hueMax, saturationMax, valueMax,auto_color_detect);
 
 	    for (PuzzlePiece puzzlePiece : pieces) {
 		PuzzlePieceCornerDetector.cornerFindeByQuaters(harisBlockSize, harisApertureSize, harisK,
