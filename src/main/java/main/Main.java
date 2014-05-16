@@ -17,19 +17,25 @@ public class Main
     {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
-        Mat image = Utilities.readImage("/1.jpg");
+        Mat puzzle = Utilities.readImage("/puzzle1.jpg");
 
-	    Mat eyePiece = Utilities.readImage("/eyePiece.jpg");
+	    Mat piece1 = Utilities.readImage("/piece1.jpg");
+	    Mat piece2 = Utilities.readImage("/piece2.jpg");
+	    Mat piece3 = Utilities.readImage("/piece3.jpg");
+	    Mat piece4 = Utilities.readImage("/piece4.jpg");
 
         Map<Integer, Mat> puzzlePieces = new HashMap<>();
 
-        GaussianBlur(eyePiece, eyePiece, new Size(1, 1), 3);
-        Utilities.writeImageToFile(eyePiece, "blurred.jpg");
+        GaussianBlur(piece1, piece1, new Size(3, 3), 3);
+//        Utilities.writeImageToFile(piece1, "blurred.jpg");
 
-        puzzlePieces.put(1, eyePiece);
+        puzzlePieces.put(1, piece1);
+        puzzlePieces.put(2, piece2);
+        puzzlePieces.put(3, piece3);
+        puzzlePieces.put(4, piece4);
 
         double[] backgroundColor = {255, 255, 255};
-        PuzzleAssembler.instance.assemblePieces(puzzlePieces, image, backgroundColor);
+        PuzzleAssembler.instance.assemblePieces(puzzlePieces, puzzle, backgroundColor);
     }
 
     private void testAffineTransform() throws Exception
