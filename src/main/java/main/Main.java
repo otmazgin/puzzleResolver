@@ -1,43 +1,45 @@
 package main;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import assembler.PuzzleAssembler;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
-
+import org.opencv.core.Size;
 import utillities.Utilities;
-import assembler.PuzzleAssembler;
 
-public class Main {
-    public static void main(String[] args) throws Exception {
-	System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+import java.util.HashMap;
+import java.util.Map;
 
-	Mat image = Utilities.readImage("/1.jpg");
+import static org.opencv.imgproc.Imgproc.GaussianBlur;
 
-	/*
-	 * Mat lips = Utilities.readImage("/lips.jpg"); Mat rotatedLips =
-	 * Utilities.readImage("/lips_rotated.jpg"); Mat leftEye = Utilities.readImage("/leftEye.jpg"); Mat
-	 * nose = Utilities.readImage("/nose.jpg"); Mat hair = Utilities.readImage("/hair.jpg"); Mat dash =
-	 * Utilities.readImage("/dash.jpg");
-	 */
-	Mat eyePiece = Utilities.readImage("/eyePiece.jpg");
-	// Mat lipsPiece = Utilities.readImage("/lipsPiece.jpg");
+public class Main
+{
+    public static void main(String[] args) throws Exception
+    {
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
-	List<Mat> puzzlePieces = new ArrayList<>();
-	/*
-	 * puzzlePieces.add(lips); puzzlePieces.add(leftEye); puzzlePieces.add(nose); puzzlePieces.add(hair);
-	 * puzzlePieces.add(lips); puzzlePieces.add(dash); puzzlePieces.add(rotatedLips);
-	 */
-	puzzlePieces.add(eyePiece);
+        Mat puzzle = Utilities.readImage("/puzzle1.jpg");
 
-	double[] backgroundColor = { 255, 255, 255 };
-	PuzzleAssembler.instance.assemblePieces(puzzlePieces, image, backgroundColor);
+	    Mat piece1 = Utilities.readImage("/piece1.jpg");
+	    Mat piece2 = Utilities.readImage("/piece2.jpg");
+	    Mat piece3 = Utilities.readImage("/piece3.jpg");
+	    Mat piece4 = Utilities.readImage("/piece4.jpg");
+
+        Map<Integer, Mat> puzzlePieces = new HashMap<>();
+
+        GaussianBlur(piece1, piece1, new Size(3, 3), 3);
+//        Utilities.writeImageToFile(piece1, "blurred.jpg");
+
+        puzzlePieces.put(1, piece1);
+        puzzlePieces.put(2, piece2);
+        puzzlePieces.put(3, piece3);
+        puzzlePieces.put(4, piece4);
+
+        double[] backgroundColor = {255, 255, 255};
+        PuzzleAssembler.instance.assemblePieces(puzzlePieces, puzzle, backgroundColor);
     }
 
-    private void testAffineTransform() throws Exception {
-
-	Mat puzzlePiece = Utilities.readImage("turtle_one_piece.png");
-
+    private void testAffineTransform() throws Exception
+    {
+        Mat puzzlePiece = Utilities.readImage("turtle_one_piece.png");
     }
 }

@@ -55,7 +55,7 @@ public class Utilities
 	}
 
 	public static void drawRect(Rect rect, Mat image) {
-		Core.rectangle(image, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height), new Scalar(0, 0, 0));
+		Core.rectangle(image, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height), new Scalar(0, 0, 255));
 	}
 
 	public static void drawPoint(Point point, Mat image) {
