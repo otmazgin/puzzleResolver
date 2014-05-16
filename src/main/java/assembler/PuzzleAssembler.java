@@ -9,6 +9,7 @@ import utillities.Utilities;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -19,7 +20,7 @@ public enum PuzzleAssembler
 
     private static final int numberOfCPUCores = 4;
 
-    public void assemblePieces(Collection<Mat> puzzlePieces, Mat puzzle, double[] backgroundColor)
+    public void assemblePieces(Collection<Mat> puzzlePieces, Mat puzzle, double[] backgroundColor) throws Exception
     {
         System.out.println("Started assembling at: " + new Date());
 
@@ -34,23 +35,19 @@ public enum PuzzleAssembler
 
         executorService.shutdown();
 
-        for (Future<Match> future : futures)
+        for (Future<Match> futureMatch : futures)
         {
-            try
-            {
-                Match match = future.get();
-                Rect matchRectangle = new Rect(match.getMatchPoint(), new Size(match.getWidth(), match.getHeight()));
-
-                Utilities.drawRect(matchRectangle, puzzle);
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
+            Utilities.drawRect(getRectangleOf(futureMatch), puzzle);
         }
 
         Utilities.writeImageToFile(puzzle, "matches.jpg");
 
         System.out.println("Finished assembling at: " + new Date());
+    }
+
+    private Rect getRectangleOf(Future<Match> future) throws InterruptedException, ExecutionException
+    {
+        Match match = future.get();
+        return new Rect(match.getMatchPoint(), new Size(match.getWidth(), match.getHeight()));
     }
 }
