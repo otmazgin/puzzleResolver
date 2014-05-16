@@ -8,4 +8,5 @@ Haris_apertureSize=5
 Haris_k=0.05
 Haris_blockSize=2
 Haris_threashHold=0
-src_pic=test9.jpg
+src_pic=test20.jpg
+auto_color_detect=True
