@@ -30,6 +30,9 @@ public class Main {
 	 * puzzlePieces.add(lips); puzzlePieces.add(dash); puzzlePieces.add(rotatedLips);
 	 */
 	puzzlePieces.add(eyePiece);
+	puzzlePieces.add(eyePiece);
+	puzzlePieces.add(eyePiece);
+	puzzlePieces.add(eyePiece);
 
 	double[] backgroundColor = { 255, 255, 255 };
 	PuzzleAssembler.instance.assemblePieces(puzzlePieces, image, backgroundColor);

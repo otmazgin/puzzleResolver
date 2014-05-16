@@ -1,7 +1,9 @@
 package assembler;
 
+import assembler.templateMatcher.Match;
 import org.opencv.core.Mat;
 import org.opencv.core.Rect;
+import org.opencv.core.Size;
 import utillities.Utilities;
 
 import java.util.ArrayList;
@@ -23,7 +25,7 @@ public enum PuzzleAssembler
 
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfCPUCores);
 
-        Collection<Future<Rect>> futures = new ArrayList<>();
+        Collection<Future<Match>> futures = new ArrayList<>();
 
         for (Mat puzzlePiece : puzzlePieces)
         {
@@ -32,11 +34,14 @@ public enum PuzzleAssembler
 
         executorService.shutdown();
 
-        for (Future<Rect> future : futures)
+        for (Future<Match> future : futures)
         {
             try
             {
-                Utilities.drawRect(future.get(), puzzle);
+                Match match = future.get();
+                Rect matchRectangle = new Rect(match.getMatchPoint(), new Size(match.getWidth(), match.getHeight()));
+
+                Utilities.drawRect(matchRectangle, puzzle);
             }
             catch (Exception e)
             {

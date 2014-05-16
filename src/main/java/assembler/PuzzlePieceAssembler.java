@@ -1,14 +1,14 @@
 package assembler;
 
+import assembler.templateMatcher.Match;
+import assembler.templateMatcher.TemplateMatcher;
 import org.opencv.core.Mat;
-import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Size;
-import utillities.Optional;
 
 import java.util.concurrent.Callable;
 
-class PuzzlePieceAssembler implements Callable<Rect>
+class PuzzlePieceAssembler implements Callable<Match>
 {
     private final Mat puzzlePiece;
     private final Mat puzzle;
@@ -22,42 +22,39 @@ class PuzzlePieceAssembler implements Callable<Rect>
     }
 
     @Override
-    public Rect call() throws Exception
+    public Match call() throws Exception
     {
         PuzzlePieceRestorer.instance.restoreMissingGaps(puzzlePiece, backgroundColor);
 
-        Optional<Point> matchingPoint = TemplateMatcher.instance.findBestMatching(puzzle, puzzlePiece);
+        Match bestMatch = TemplateMatcher.instance.findBestMatch(puzzle, puzzlePiece);
 
-        int numOfDirectionsTested = 1;
+        int numOfRotations = 0;
         Mat rotatedPuzzlePiece = puzzlePiece;
+        Match rotationBestMatch;
 
-        while (!matchingPoint.isPresent() && numOfDirectionsTested <= 4)
+        while (numOfRotations <= 3)
         {
+            if (bestMatch.getMatchValue() > 0.99)
+            {
+                return bestMatch;
+            }
+
             rotatedPuzzlePiece = ImageRotator.instance.rotateLeft(rotatedPuzzlePiece);
 
-            matchingPoint = TemplateMatcher.instance.findBestMatching(puzzle, rotatedPuzzlePiece);
+            rotationBestMatch = TemplateMatcher.instance.findBestMatch(puzzle, rotatedPuzzlePiece);
 
-            numOfDirectionsTested++;
+            if (rotationBestMatch.compareTo(bestMatch) > 0)
+            {
+                bestMatch = rotationBestMatch;
+            }
+
+            numOfRotations++;
         }
 
-        if (matchingPoint.isPresent())
-        {
-            if (numOfDirectionsTested % 2 == 0)
-            {
-                return new Rect(matchingPoint.get(), new Size(puzzlePiece.rows(), puzzlePiece.cols()));
-            }
-            else
-            {
-                return new Rect(matchingPoint.get(), new Size(puzzlePiece.cols(), puzzlePiece.rows()));
-            }
-        }
-        else
-        {
-            throw new RuntimeException("Match not found!");
-        }
+        return bestMatch;
     }
 
-    static Callable<Rect> createAssembler(Mat puzzlePiece, Mat puzzle, double[] backgroundColor)
+    static Callable<Match> createAssembler(Mat puzzlePiece, Mat puzzle, double[] backgroundColor)
     {
         return new PuzzlePieceAssembler(puzzlePiece, puzzle, backgroundColor);
     }

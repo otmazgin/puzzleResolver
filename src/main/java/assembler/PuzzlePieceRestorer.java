@@ -26,7 +26,7 @@ enum PuzzlePieceRestorer
 
         inpaint(puzzlePiece, maskOfGaps, puzzlePiece, 1, INPAINT_TELEA);
 
-        Utilities.writeImageToFile(puzzlePiece, "inpainted.jpg");
+        //Utilities.writeImageToFile(puzzlePiece, "inpainted.jpg");
     }
 
     private void inpaintLeftMiddleSuspectedGap(Mat puzzlePiece, double[] backgroundColor, Mat maskOfGaps)
