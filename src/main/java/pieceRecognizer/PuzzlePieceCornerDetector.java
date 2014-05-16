@@ -51,15 +51,16 @@ public class PuzzlePieceCornerDetector {
 	Mat tempMat = new Mat();
 	Mat cornerMat = new Mat(mask.size(), CvType.CV_32FC1);
 	Imgproc.cvtColor(mask, tempMat, Imgproc.COLOR_RGB2GRAY);
-	Imgproc.blur(tempMat, tempMat, new Size(4, 4));
+	Imgproc.blur(tempMat, tempMat, new Size(6, 6));
 
 	Corner[] corners = new Corner[4];
 
-	for (int i = 0; i < corners.length; i++) {
-	    corners[i] = new Corner(0, 0, 0);
-	}
+
 
 	while (!isRect) {
+		for (int i = 0; i < corners.length; i++) {
+		    corners[i] = new Corner(0, 0, 0);
+		}
 	    Imgproc.cornerHarris(tempMat, cornerMat, blockSize, apertureSize, k, Imgproc.BORDER_DEFAULT);
 	    Core.normalize(cornerMat, cornerMat, 0, 255, Core.NORM_MINMAX, CvType.CV_32FC1, new Mat());
 	    Core.convertScaleAbs(cornerMat, cornerMat);
@@ -67,9 +68,9 @@ public class PuzzlePieceCornerDetector {
 	    for (int j = 0; j < cornerMat.rows(); j++) {
 		for (int i = 0; i < cornerMat.cols(); i++) {
 		    double pixelValue = cornerMat.get(j, i)[0];
-		    if ((int) pixelValue <= threashHold) {
-			continue;
-		    }
+		 //   if ((int) pixelValue <= threashHold) {
+		//	continue;
+		 //   }
 
 		    for (int c = 0; c < corners.length; c++) {
 			if ((isCornerInQuater(i, j, c, rect)) && (corners[c].getGrade() < pixelValue)) {
