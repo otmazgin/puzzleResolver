@@ -3,8 +3,6 @@ package assembler.templateMatcher;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-import org.opencv.core.Point;
-import utillities.Optional;
 
 import static org.opencv.imgproc.Imgproc.TM_CCORR_NORMED;
 import static org.opencv.imgproc.Imgproc.matchTemplate;

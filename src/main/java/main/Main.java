@@ -1,13 +1,15 @@
 package main;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import assembler.PuzzleAssembler;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
-
+import org.opencv.core.Size;
 import utillities.Utilities;
-import assembler.PuzzleAssembler;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.opencv.imgproc.Imgproc.GaussianBlur;
 
 public class Main
 {
@@ -17,24 +19,14 @@ public class Main
 
         Mat image = Utilities.readImage("/1.jpg");
 
-	/*
-     * Mat lips = Utilities.readImage("/lips.jpg"); Mat rotatedLips =
-	 * Utilities.readImage("/lips_rotated.jpg"); Mat leftEye = Utilities.readImage("/leftEye.jpg"); Mat
-	 * nose = Utilities.readImage("/nose.jpg"); Mat hair = Utilities.readImage("/hair.jpg"); Mat dash =
-	 * Utilities.readImage("/dash.jpg");
-	 */
-        Mat eyePiece = Utilities.readImage("/eyePiece.jpg");
-        // Mat lipsPiece = Utilities.readImage("/lipsPiece.jpg");
+	    Mat eyePiece = Utilities.readImage("/eyePiece.jpg");
 
-        List<Mat> puzzlePieces = new ArrayList<>();
-	/*
-	 * puzzlePieces.add(lips); puzzlePieces.add(leftEye); puzzlePieces.add(nose); puzzlePieces.add(hair);
-	 * puzzlePieces.add(lips); puzzlePieces.add(dash); puzzlePieces.add(rotatedLips);
-	 */
-        puzzlePieces.add(eyePiece);
-        puzzlePieces.add(eyePiece);
-        puzzlePieces.add(eyePiece);
-        puzzlePieces.add(eyePiece);
+        Map<Integer, Mat> puzzlePieces = new HashMap<>();
+
+        GaussianBlur(eyePiece, eyePiece, new Size(1, 1), 3);
+        Utilities.writeImageToFile(eyePiece, "blurred.jpg");
+
+        puzzlePieces.put(1, eyePiece);
 
         double[] backgroundColor = {255, 255, 255};
         PuzzleAssembler.instance.assemblePieces(puzzlePieces, image, backgroundColor);
@@ -42,8 +34,6 @@ public class Main
 
     private void testAffineTransform() throws Exception
     {
-
         Mat puzzlePiece = Utilities.readImage("turtle_one_piece.png");
-
     }
 }

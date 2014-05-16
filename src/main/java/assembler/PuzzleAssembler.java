@@ -1,14 +1,15 @@
 package assembler;
 
 import assembler.templateMatcher.Match;
+import com.google.common.base.Function;
+import com.google.common.collect.Maps;
 import org.opencv.core.Mat;
 import org.opencv.core.Rect;
 import org.opencv.core.Size;
 import utillities.Utilities;
+import utillities.ValueFromFuture;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -20,29 +21,35 @@ public enum PuzzleAssembler
 
     private static final int numberOfCPUCores = 4;
 
-    public void assemblePieces(Collection<Mat> puzzlePieces, Mat puzzle, double[] backgroundColor) throws Exception
+    public Map<Integer, Match> assemblePieces(Map<Integer, Mat> puzzlePieces, Mat puzzle, double[] backgroundColor) throws Exception
     {
         System.out.println("Started assembling at: " + new Date());
 
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfCPUCores);
 
-        Collection<Future<Match>> futures = new ArrayList<>();
+        Map<Integer, Future<Match>> futures = new HashMap<>();
 
-        for (Mat puzzlePiece : puzzlePieces)
+        for (Map.Entry<Integer, Mat> puzzlePiece : puzzlePieces.entrySet())
         {
-            futures.add(executorService.submit(PuzzlePieceAssembler.createAssembler(puzzlePiece, puzzle, backgroundColor)));
+            futures.put
+                    (
+                            puzzlePiece.getKey(),
+                            executorService.submit(PuzzlePieceAssembler.createAssembler(puzzlePiece.getValue(), puzzle, backgroundColor))
+                    );
         }
 
         executorService.shutdown();
 
-        for (Future<Match> futureMatch : futures)
+        for (Map.Entry<Integer, Future<Match>> futureMatch : futures.entrySet())
         {
-            Utilities.drawRect(getRectangleOf(futureMatch), puzzle);
+            Utilities.drawRect(getRectangleOf(futureMatch.getValue()), puzzle);
         }
 
         Utilities.writeImageToFile(puzzle, "matches.jpg");
 
         System.out.println("Finished assembling at: " + new Date());
+
+        return Maps.transformValues(futures, ValueFromFuture.<Match>create());
     }
 
     private Rect getRectangleOf(Future<Match> future) throws InterruptedException, ExecutionException
