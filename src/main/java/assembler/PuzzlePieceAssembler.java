@@ -10,12 +10,14 @@ import java.util.concurrent.Callable;
 
 class PuzzlePieceAssembler implements Callable<Match>
 {
+    private final int pieceNumber;
     private final Mat puzzlePiece;
     private final Mat puzzle;
     private double[] backgroundColor;
 
-    PuzzlePieceAssembler(Mat puzzlePiece, Mat puzzle, double[] backgroundColor)
+    PuzzlePieceAssembler(int pieceNumber, Mat puzzlePiece, Mat puzzle, double[] backgroundColor)
     {
+        this.pieceNumber = pieceNumber;
         this.puzzlePiece = puzzlePiece;
         this.puzzle = puzzle;
         this.backgroundColor = backgroundColor;
@@ -24,6 +26,8 @@ class PuzzlePieceAssembler implements Callable<Match>
     @Override
     public Match call() throws Exception
     {
+        System.out.println("Started assembling piece number: " + pieceNumber);
+
         PuzzlePieceRestorer.instance.restoreMissingGaps(puzzlePiece, backgroundColor);
 
         Match bestMatch = TemplateMatcher.instance.findBestMatch(puzzle, puzzlePiece);
@@ -36,6 +40,7 @@ class PuzzlePieceAssembler implements Callable<Match>
         {
             if (bestMatch.getMatchValue() > 0.99)
             {
+                System.out.println("Finished assembling piece number: " + pieceNumber);
                 return bestMatch;
             }
 
@@ -51,11 +56,13 @@ class PuzzlePieceAssembler implements Callable<Match>
             numOfRotations++;
         }
 
+        System.out.println("Finished assembling piece number: " + pieceNumber);
+
         return bestMatch;
     }
 
-    static Callable<Match> createAssembler(Mat puzzlePiece, Mat puzzle, double[] backgroundColor)
+    static Callable<Match> createAssembler(int pieceNumber, Mat puzzlePiece, Mat puzzle, double[] backgroundColor)
     {
-        return new PuzzlePieceAssembler(puzzlePiece, puzzle, backgroundColor);
+        return new PuzzlePieceAssembler(pieceNumber, puzzlePiece, puzzle, backgroundColor);
     }
 }

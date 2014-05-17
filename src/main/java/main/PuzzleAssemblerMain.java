@@ -1,6 +1,8 @@
 package main;
 
 import assembler.PuzzleAssembler;
+import assembler.PuzzleMatchesDrawer;
+import assembler.templateMatcher.Match;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Size;
@@ -11,7 +13,7 @@ import java.util.Map;
 
 import static org.opencv.imgproc.Imgproc.GaussianBlur;
 
-public class PuzzleAssemberMain
+public class PuzzleAssemblerMain
 {
     public static void main(String[] args) throws Exception
     {
@@ -39,8 +41,10 @@ public class PuzzleAssemberMain
         puzzlePieces.put(3, piece3);
         puzzlePieces.put(4, piece4);
 
-        double[] backgroundColor = {255, 255, 255};
-        PuzzleAssembler.instance.assemblePieces(puzzlePieces, puzzle, backgroundColor);
-    }
+        Map<Integer,Match> piecesMatches = PuzzleAssembler.instance.assemblePieces(puzzlePieces, puzzle, new double[]{255, 255, 255});
 
+        PuzzleMatchesDrawer.instance.drawMatches(piecesMatches, puzzle);
+
+        Utilities.writeImageToFile(puzzle, "matches.jpg");
+    }
 }
