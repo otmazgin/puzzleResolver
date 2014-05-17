@@ -1,6 +1,7 @@
 package pieceRecognizer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.opencv.core.Core;
@@ -13,49 +14,40 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
 public class PuzzlePiece {
-    private Mat	      originaSrc;
-    private Mat	      mask;
-    private Rect	     rect;
-    private List<MatOfPoint> contoures;
-    private double	   area;
-    private Mat	      cornerMat;
-    static Scalar	    wColor = new Scalar(255, 255, 255);
-    private Mat	      hierarchy;
-    private List<Corner>     cornersList;
-    private int	      contoureNum;
+    private Mat	  originaSrc;
+    private Mat	  mask;
+    private Rect	 rect;
+    private MatOfPoint   contoure;
+    static Scalar	wColor = new Scalar(255, 255, 255);
+    private Mat	  hierarchy;
+    private List<Corner> cornersList;
 
-    public PuzzlePiece(Mat originalSrc, List<MatOfPoint> contoures, Mat hierarchy, int contoure) {
+    public PuzzlePiece(Mat originalSrc, MatOfPoint contoure, Mat hierarchy) {
 	super();
 	this.originaSrc = originalSrc;
-	this.contoures = contoures;
+	this.contoure = contoure;
 	this.hierarchy = hierarchy;
-	this.contoureNum = contoure;
 	this.mask = new Mat(originalSrc.size(), CvType.CV_8UC3);
-	Imgproc.drawContours(this.mask, this.contoures, contoure, wColor, -1, 1, this.hierarchy, 0,
+	Imgproc.drawContours(this.mask, Arrays.asList(contoure), 0, wColor, -1, 1, this.hierarchy, 0,
 		new Point());
-	this.rect = Imgproc.boundingRect(contoures.get(contoure));
-	this.area = this.rect.area();
+	this.rect = Imgproc.boundingRect(contoure);
 	this.cornersList = new ArrayList<Corner>();
     }
 
+    public Mat getPiece() {
+	return new Mat(this.originaSrc, this.rect);
+    }
+
     public void drawPiece(Mat drawing) {
-	Imgproc.drawContours(drawing, getcontoures(), getContoureNum(), wColor, -1, 1, getHierarchy(), 0,
+	Imgproc.drawContours(drawing, Arrays.asList(getcontoure()), 0, wColor, -1, 1, getHierarchy(), 0,
 		new Point());
     }
 
     public void drawCorners(Mat drawing) {
-	for (int i = 0; i < getCornersList().size(); i++) {
-	    Core.circle(drawing, new Point(getCornersList().get(i).getX(), getCornersList().get(i).getY()),
-		    5, new Scalar(Math.random() * 255), 1, 8, 0);
+	for (Corner corner : getCornersList()) {
+	    Core.circle(drawing, new Point(corner.getX(), corner.getY()), 5, new Scalar(Math.random() * 255),
+		    1, 8, 0);
 	}
-    }
-
-    public int getContoureNum() {
-	return this.contoureNum;
-    }
-
-    public void setContoureNum(int contoureNum) {
-	this.contoureNum = contoureNum;
     }
 
     public Mat getHierarchy() {
@@ -90,28 +82,16 @@ public class PuzzlePiece {
 	this.rect = rect;
     }
 
-    public List<MatOfPoint> getcontoures() {
-	return this.contoures;
+    public MatOfPoint getcontoure() {
+	return this.contoure;
     }
 
-    public void setcontoures(List<MatOfPoint> contoures) {
-	this.contoures = contoures;
+    public void setcontoures(MatOfPoint contoure) {
+	this.contoure = contoure;
     }
 
     public double getArea() {
-	return this.area;
-    }
-
-    public void setArea(double area) {
-	this.area = area;
-    }
-
-    public Mat getCornerMat() {
-	return this.cornerMat;
-    }
-
-    public void setCornerMat(Mat cornerMat) {
-	this.cornerMat = cornerMat;
+	return this.rect.area();
     }
 
     public List<Corner> getCornersList() {

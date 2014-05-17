@@ -37,7 +37,7 @@ public class MainTest {
 	    Mat src = Highgui.imread(filePath);
 
 	    List<PuzzlePiece> pieces = PuzzlePieceDetector.pieceDetector(src, hueMin, saturationMin,
-		    valueMin, hueMax, saturationMax, valueMax,auto_color_detect);
+		    valueMin, hueMax, saturationMax, valueMax, auto_color_detect);
 
 	    for (PuzzlePiece puzzlePiece : pieces) {
 		PuzzlePieceCornerDetector.cornerFindeByQuaters(harisBlockSize, harisApertureSize, harisK,

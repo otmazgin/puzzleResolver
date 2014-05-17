@@ -1,15 +1,31 @@
 package transformations;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
+import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
 public enum AffineTransformator {
 
     instance;
+
+    /**
+     * @param srcImage
+     * @param srcPoints
+     * @param width
+     * @param height
+     * @return
+     */
+    public Mat transform(Mat srcImage, List<Point> srcPoints, int width, int height) {
+
+	List<Point> dstPoints = Arrays.asList(new Point(0, 0), new Point(width, 0), new Point(width, height));
+	return this.transform(srcImage, new Mat(new Size(width, height), srcImage.type()), srcPoints,
+		dstPoints);
+    }
 
     /**
      * Execute affine transform on <code>srcImg</code> using <code>srcPoints</code> and

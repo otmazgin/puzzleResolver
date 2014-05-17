@@ -22,20 +22,18 @@ public class PuzzlePieceDetector {
 	Imgproc.cvtColor(srcImage, srcGray, Imgproc.COLOR_RGB2HSV);
 	byte[] data = new byte[3];
 
-	
 	srcGray.get(0, 0, data);
-	System.out.print(data[0] +" " +  data[1] +" "+ data [2]);
-	
-	if (!auto)
-	Core.inRange(srcGray, new Scalar(hueMin, saturationMin,valueMin ), new Scalar(hueMax, saturationMax,
-			valueMax), srcGray);
-	else
-	{
-		int hue = (data[0] & 0xFF);
-		int saturation = (data[1] & 0xFF);
-		int value = (data[2] & 0xFF);
-	Core.inRange(srcGray, new Scalar(hue-10, saturation-20, 0), new Scalar(hue+10, saturation+40,
-				255), srcGray);
+	System.out.print(data[0] + " " + data[1] + " " + data[2]);
+
+	if (!auto) {
+	    Core.inRange(srcGray, new Scalar(hueMin, saturationMin, valueMin), new Scalar(hueMax,
+		    saturationMax, valueMax), srcGray);
+	} else {
+	    int hue = (data[0] & 0xFF);
+	    int saturation = (data[1] & 0xFF);
+	    int value = (data[2] & 0xFF);
+	    Core.inRange(srcGray, new Scalar(hue - 10, saturation - 20, 0), new Scalar(hue + 10,
+		    saturation + 40, 255), srcGray);
 	}
 	Mat tmp = srcGray.clone();
 	tmp.setTo(new Scalar(255, 255, 255));
@@ -56,13 +54,14 @@ public class PuzzlePieceDetector {
 	    }
 	}
 
-	for (int i = 0; i < contours.size(); i++) {
-	    Rect rect = Imgproc.boundingRect(contours.get(i));
+	for (MatOfPoint contour : contours) {
+	    Rect rect = Imgproc.boundingRect(contour);
 
 	    if (rect.area() > (maxArea / 2)) {
-		detectedPieces.add(new PuzzlePiece(srcImage, contours, hierarchy, i));
+		detectedPieces.add(new PuzzlePiece(srcImage, contour, hierarchy));
 
 	    }
+
 	}
 
 	return detectedPieces;
