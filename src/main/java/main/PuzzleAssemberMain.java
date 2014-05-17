@@ -34,8 +34,8 @@ public class PuzzleAssemberMain
         GaussianBlur(piece1, piece1, new Size(3, 3), 3);
         // Utilities.writeImageToFile(piece1, "blurred.jpg");
 
-        puzzlePieces.put(1, piece1);
-        puzzlePieces.put(2, piece2);
+        //puzzlePieces.put(1, piece1);
+        //puzzlePieces.put(2, piece2);
         puzzlePieces.put(3, piece3);
         puzzlePieces.put(4, piece4);
 

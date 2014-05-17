@@ -1,11 +1,8 @@
 package assembler;
 
 import assembler.templateMatcher.Match;
-import com.google.common.base.Function;
 import com.google.common.collect.Maps;
-import org.opencv.core.Mat;
-import org.opencv.core.Rect;
-import org.opencv.core.Size;
+import org.opencv.core.*;
 import utillities.Utilities;
 import utillities.ValueFromFuture;
 
@@ -14,6 +11,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
+import static org.opencv.core.Core.putText;
 
 public enum PuzzleAssembler
 {
@@ -42,7 +41,7 @@ public enum PuzzleAssembler
 
         for (Map.Entry<Integer, Future<Match>> futureMatch : futures.entrySet())
         {
-            Utilities.drawRect(getRectangleOf(futureMatch.getValue()), puzzle);
+            drawPieceNumberOn(puzzle, futureMatch);
         }
 
         Utilities.writeImageToFile(puzzle, "matches.jpg");
@@ -52,9 +51,12 @@ public enum PuzzleAssembler
         return Maps.transformValues(futures, ValueFromFuture.<Match>create());
     }
 
-    private Rect getRectangleOf(Future<Match> future) throws InterruptedException, ExecutionException
+    private void drawPieceNumberOn(Mat puzzle, Map.Entry<Integer, Future<Match>> futureMatch) throws InterruptedException, ExecutionException
     {
-        Match match = future.get();
-        return new Rect(match.getMatchPoint(), new Size(match.getWidth(), match.getHeight()));
+        Match match = futureMatch.getValue().get();
+        Point matchPoint = match.getMatchPoint();
+        Point pieceCenter = new Point(matchPoint.x + (match.getWidth() / 2) - 30, matchPoint.y + (match.getHeight() / 2));
+
+        putText(puzzle, futureMatch.getKey().toString(), pieceCenter, 1, 10, new Scalar(0, 0, 255), 15);
     }
 }
