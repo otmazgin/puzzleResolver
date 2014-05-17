@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
+import org.opencv.core.Rect;
 
 import pieceRecognizer.Corner;
 import pieceRecognizer.PuzzlePiece;
@@ -16,20 +17,26 @@ public enum PuzzlePieceTransformer {
 
     instance;
 
-    public static final int WIDTH  = 1200;
-    public static final int HEIGHT = 1600;
+    public static final int WIDTH  = 1600;
+    public static final int HEIGHT = 1200;
 
     public Puzzle transformPieces(Mat puzzleImg, List<PuzzlePiece> pieces, int puzzleColumns, int puzzleRows) {
 
 	List<Mat> transformedPieces = new ArrayList<>();
-	List<Point> completedPuzzlePoints = Arrays.asList(new Point(0, 0), new Point(puzzleImg.height(), 0),
+	List<Point> completedPuzzlePoints = Arrays.asList(new Point(0, 0), new Point(0, puzzleImg.height()),
 		new Point(puzzleImg.width(), puzzleImg.height()));
 	Mat transformedPuzzle = AffineTransformator.instance.transform(puzzleImg, completedPuzzlePoints,
 		WIDTH, HEIGHT);
 
 	for (PuzzlePiece puzzlePiece : pieces) {
-	    List<Point> pieceTransformPoints = orderPiecePointsForTransf(puzzlePiece.getCornersList(),
-		    puzzleColumns > puzzleRows);
+
+	    List<Point> pieceTransformPoints = adjustAndOrderPiecePointsForTransf(
+		    puzzlePiece.getCornersList(), puzzlePiece.getRect(), puzzleColumns > puzzleRows);
+
+	    if (pieceTransformPoints.isEmpty()) {
+		continue;
+	    }
+
 	    Mat transformedPiece = AffineTransformator.instance.transform(puzzlePiece.getPiece(),
 		    pieceTransformPoints, WIDTH / puzzleColumns, HEIGHT / puzzleRows);
 	    transformedPieces.add(transformedPiece);
@@ -39,11 +46,16 @@ public enum PuzzlePieceTransformer {
 
     }
 
-    private List<Point> orderPiecePointsForTransf(List<Corner> cornersList, boolean isLandscape) {
+    private List<Point> adjustAndOrderPiecePointsForTransf(List<Corner> cornersList, Rect boundingBox,
+	    boolean isLandscape) {
 	if (cornersList.size() != 4) {
 	    return Collections.emptyList();
 	}
 
+	for (Corner corner : cornersList) {
+	    corner.setX(corner.getX() - boundingBox.x);
+	    corner.setY(corner.getY() - boundingBox.y);
+	}
 	double firstDiff = cornersList.get(0).distance(cornersList.get(1));
 	double secondDiff = cornersList.get(1).distance(cornersList.get(2));
 	boolean isPieceInLandscape = secondDiff - firstDiff > 0;

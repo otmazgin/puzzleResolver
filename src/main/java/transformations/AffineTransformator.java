@@ -22,7 +22,8 @@ public enum AffineTransformator {
      */
     public Mat transform(Mat srcImage, List<Point> srcPoints, int width, int height) {
 
-	List<Point> dstPoints = Arrays.asList(new Point(0, 0), new Point(width, 0), new Point(width, height));
+	List<Point> dstPoints = Arrays
+		.asList(new Point(0, 0), new Point(0, height), new Point(width, height));
 	return this.transform(srcImage, new Mat(new Size(width, height), srcImage.type()), srcPoints,
 		dstPoints);
     }
@@ -42,8 +43,9 @@ public enum AffineTransformator {
      * @return <code>dstImg</code>
      */
     public Mat transform(Mat srcImage, Mat dstImage, List<Point> srcPoints, List<Point> dstPoints) {
-	MatOfPoint2f srcMatPoints = new MatOfPoint2f((Point[]) srcPoints.toArray());
-	MatOfPoint2f destMatPoints = new MatOfPoint2f((Point[]) dstPoints.toArray());
+
+	MatOfPoint2f srcMatPoints = new MatOfPoint2f(listToArray(srcPoints));
+	MatOfPoint2f destMatPoints = new MatOfPoint2f(listToArray(dstPoints));
 
 	Mat affineTransformMat = Imgproc.getAffineTransform(srcMatPoints, destMatPoints);
 
@@ -51,5 +53,13 @@ public enum AffineTransformator {
 
 	return dstImage;
 
+    }
+
+    private Point[] listToArray(List<Point> srcPoints) {
+	Point[] srcPointArr = new Point[srcPoints.size()];
+	for (int i = 0; i < srcPointArr.length; i++) {
+	    srcPointArr[i] = srcPoints.get(i);
+	}
+	return srcPointArr;
     }
 }
