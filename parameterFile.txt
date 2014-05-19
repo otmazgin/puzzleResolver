@@ -1,5 +1,5 @@
 background_h_min=70
-background_s_min=80
+background_s_min=0
 background_v_min=100
 background_h_max=90
 background_s_max=180
@@ -9,4 +9,4 @@ Haris_k=0.05
 Haris_blockSize=2
 Haris_threashHold=0
 src_pic=test20.jpg
-auto_color_detect=True
+auto_color_detect=False
