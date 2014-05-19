@@ -1,5 +1,5 @@
 background_h_min=70
-background_s_min=120
+background_s_min=80
 background_v_min=100
 background_h_max=90
 background_s_max=180
