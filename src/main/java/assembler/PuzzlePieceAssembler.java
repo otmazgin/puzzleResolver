@@ -1,5 +1,6 @@
 package assembler;
 
+import assembler.templateMatcher.FastTemplateMatcher;
 import assembler.templateMatcher.Match;
 import assembler.templateMatcher.TemplateMatcher;
 import org.opencv.core.Mat;
@@ -30,7 +31,8 @@ class PuzzlePieceAssembler implements Callable<Match>
 
         PuzzlePieceRestorer.instance.restoreMissingGaps(puzzlePiece, backgroundColor);
 
-        Match bestMatch = TemplateMatcher.instance.findBestMatch(puzzle, puzzlePiece);
+        //Match bestMatch = TemplateMatcher.instance.findBestMatch(puzzle, puzzlePiece);
+        Match bestMatch = FastTemplateMatcher.instance.findBestMatch(puzzle, puzzlePiece, 3);
 
         int numOfRotations = 0;
         Mat rotatedPuzzlePiece = puzzlePiece;

@@ -6,6 +6,7 @@ import utillities.Utilities;
 
 import java.awt.*;
 
+import static org.opencv.photo.Photo.INPAINT_NS;
 import static org.opencv.photo.Photo.INPAINT_TELEA;
 import static org.opencv.photo.Photo.inpaint;
 
@@ -13,7 +14,7 @@ enum PuzzlePieceRestorer
 {
     instance;
 
-    private static final int distanceFromBackgroundColorThreshold = 5;
+    private static final int distanceFromBackgroundColorThreshold = 10;
 
     void restoreMissingGaps(Mat puzzlePiece, double[] backgroundColor)
     {
@@ -26,7 +27,7 @@ enum PuzzlePieceRestorer
 
         inpaint(puzzlePiece, maskOfGaps, puzzlePiece, 1, INPAINT_TELEA);
 
-        //Utilities.writeImageToFile(puzzlePiece, "inpainted.jpg");
+        //Utilities.writeImageToFile(puzzlePiece, "inpainted"+Math.random()+".jpg");
     }
 
     private void findLeftMiddleGap(Mat puzzlePiece, double[] backgroundColor, Mat maskOfGaps)

@@ -24,24 +24,19 @@ public class PuzzleAssemblerMain
 
     private static void testAssembling() throws Exception
     {
-        Mat puzzle = Utilities.readImage("/puzzle1.jpg");
+        Mat puzzle = Utilities.readImage("/p0.jpg");
 
-        Mat piece1 = Utilities.readImage("/piece1.jpg");
-        Mat piece2 = Utilities.readImage("/piece2.jpg");
-        Mat piece3 = Utilities.readImage("/piece3.jpg");
-        Mat piece4 = Utilities.readImage("/piece4.jpg");
+        Mat piece1 = Utilities.readImage("/P1.jpg");
+        Mat piece2 = Utilities.readImage("/P2.jpg");
+        Mat piece3 = Utilities.readImage("/P3.jpg");
 
         Map<Integer, Mat> puzzlePieces = new HashMap<>();
 
-        GaussianBlur(piece1, piece1, new Size(3, 3), 3);
-        // Utilities.writeImageToFile(piece1, "blurred.jpg");
-
-        //puzzlePieces.put(1, piece1);
-        //puzzlePieces.put(2, piece2);
+        puzzlePieces.put(1, piece1);
+        puzzlePieces.put(2, piece2);
         puzzlePieces.put(3, piece3);
-        puzzlePieces.put(4, piece4);
 
-        Map<Integer,Match> piecesMatches = PuzzleAssembler.instance.assemblePieces(puzzlePieces, puzzle, new double[]{255, 255, 255});
+        Map<Integer, Match> piecesMatches = PuzzleAssembler.instance.assemblePieces(puzzlePieces, puzzle, new double[]{101, 224, 180});
 
         PuzzleMatchesDrawer.instance.drawMatches(piecesMatches, puzzle);
 
