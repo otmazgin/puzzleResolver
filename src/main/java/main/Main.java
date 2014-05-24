@@ -48,6 +48,22 @@ public class Main
 
         //writePiecesAndPuzzle(puzzle);
 
+        assembleAndDraw(puzzle);
+    }
+
+    private static void writePiecesAndPuzzle(Puzzle puzzle)
+    {
+        Utilities.writeImageToFile(puzzle.getCompletePuzzle(), "p0.jpg");
+        int i = 1;
+        for (Mat piece : puzzle.getPieces())
+        {
+            Utilities.writeImageToFile(piece, "P" + i + ".jpg");
+            i++;
+        }
+    }
+
+    private static void assembleAndDraw(Puzzle puzzle) throws Exception
+    {
         Map<Integer, Mat> puzzlePieces = new HashMap<>();
 
         int index = 1;
@@ -62,16 +78,5 @@ public class Main
                 );
 
         PuzzleMatchesDrawer.instance.drawMatches(piecesMatches, puzzle.getCompletePuzzle());
-    }
-
-    private static void writePiecesAndPuzzle(Puzzle puzzle)
-    {
-        Utilities.writeImageToFile(puzzle.getCompletePuzzle(), "p0.jpg");
-        int i = 1;
-        for (Mat piece : puzzle.getPieces())
-        {
-            Utilities.writeImageToFile(piece, "P" + i + ".jpg");
-            i++;
-        }
     }
 }
