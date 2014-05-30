@@ -73,11 +73,6 @@ public class PuzzlePiece
         this.rect = rect;
     }
 
-    public double getArea()
-    {
-        return this.rect.area();
-    }
-
     public MatOfPoint getcontoure()
     {
         return this.contoure;
