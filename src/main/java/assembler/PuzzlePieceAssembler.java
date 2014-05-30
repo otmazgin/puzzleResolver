@@ -32,7 +32,7 @@ class PuzzlePieceAssembler implements Callable<Match>
 
         PuzzlePieceRestorer.instance.restoreMissingGaps(transformedPieceMatrix, backgroundColor);
 
-        //Match bestMatch = TemplateMatcher.instance.findBestMatch(puzzle, puzzlePiece);
+        //Match bestMatch = TemplateMatcher.instance.findBestMatch(puzzle, transformedPieceMatrix);
         Match bestMatch = FastTemplateMatcher.instance.findBestMatch(puzzle, transformedPieceMatrix, 3);
         puzzlePiece.setBestRotationAngle(0);
 
@@ -44,7 +44,7 @@ class PuzzlePieceAssembler implements Callable<Match>
         {
             if (bestMatch.getMatchValue() > 0.99)
             {
-                System.out.println("Finished assembling piece number: " + pieceNumber);
+                System.out.println("Finished assembling piece number: " + pieceNumber +" best match percentage: " + bestMatch.getMatchValue()*100 + "%");
                 puzzlePiece.setBestRotationAngle(numOfRotations * 90);
                 return bestMatch;
             }
@@ -62,7 +62,7 @@ class PuzzlePieceAssembler implements Callable<Match>
             numOfRotations++;
         }
 
-        System.out.println("Finished assembling piece number: " + pieceNumber);
+        System.out.println("Finished assembling piece number: " + pieceNumber +" best match percentage: " + bestMatch.getMatchValue()*100 + "%");
 
         return bestMatch;
     }

@@ -1,15 +1,13 @@
 package assembler;
 
 import assembler.templateMatcher.Match;
+import com.google.common.collect.ImmutableList;
 import entities.PuzzlePiece;
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 import utillities.Utilities;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.opencv.core.Core.putText;
 import static org.opencv.imgproc.Imgproc.*;
@@ -43,7 +41,7 @@ public enum PuzzleMatchesDrawer
     private void drawPiecesOnCompletePuzzle(Mat puzzle, Map.Entry<PuzzlePiece, Match> match)
     {
         drawPieceNumberOnTheCompletePuzzle(match, puzzle);
-        drawPieceBoundingRectangleOnTheCompletePuzzle(match, puzzle);
+        drawPieceContourOnTheCompletePuzzle(match, puzzle);
     }
 
     private void drawPieceNumberOnTheCompletePuzzle(Map.Entry<PuzzlePiece, Match> matchEntry, Mat puzzle)
@@ -56,7 +54,7 @@ public enum PuzzleMatchesDrawer
         putText(puzzle, matchEntry.getKey().getPieceNumber() + "", pieceCenter, 1, 10, new Scalar(0, 0, 255), 10);
     }
 
-    private void drawPieceBoundingRectangleOnTheCompletePuzzle(Map.Entry<PuzzlePiece, Match> matchEntry, Mat puzzle)
+    private void drawPieceContourOnTheCompletePuzzle(Map.Entry<PuzzlePiece, Match> matchEntry, Mat puzzle)
     {
         PuzzlePiece puzzlePiece = matchEntry.getKey();
         Match pieceMatch = matchEntry.getValue();
@@ -66,23 +64,66 @@ public enum PuzzleMatchesDrawer
 
         double bestRotationAngle = puzzlePiece.getBestRotationAngle();
 
-        Mat rotatedPiece = ImageRotator.instance.rotate(puzzlePiece.getTransformedPieceMatrix(), bestRotationAngle);
+        Mat rotatedPiece = ImageRotator.instance.rotate(puzzlePiece.getRotatedImage(), bestRotationAngle);
+
+        Utilities.writeImageToFile(rotatedPiece, "rotated" + puzzlePiece.getPieceNumber() + ".jpg");
 
         cvtColor(rotatedPiece, rotatedPiece, COLOR_RGB2GRAY);
 
-        Imgproc.findContours(rotatedPiece, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE, new Point(0, 0));
+        threshold( rotatedPiece, rotatedPiece, 120, 200, THRESH_BINARY );
+        //Canny(rotatedPiece, rotatedPiece, 100, 200);
 
-        Imgproc.drawContours
-                (
-                        puzzle,
-                        Arrays.asList(contours.iterator().next()),
-                        0,
-                        new Scalar(0, 0, 255),
-                        1,
-                        BORDER_ISOLATED,
-                        hierarchy,
-                        0,
-                        pieceMatch.getMatchPoint()
-                );
+        Utilities.writeImageToFile(rotatedPiece, "rotatedCanny" + puzzlePiece.getPieceNumber() + ".jpg");
+
+        findContours( rotatedPiece, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE, new Point(0, 0) );
+
+/*        double maxArea = 0;
+        double secondMaxArea = 0;
+        MatOfPoint pieceContour = null;
+        for (MatOfPoint contour : contours)
+        {
+            double contourArea = Imgproc.contourArea(contour);
+
+            if (contourArea > maxArea)
+            {
+                maxArea = contourArea;
+            }
+            else
+            {
+                if (contourArea > secondMaxArea)
+                {
+                    pieceContour = contour;
+                    secondMaxArea = contourArea;
+                }
+            }
+        }
+        Collections.sort(contours, new Comparator<MatOfPoint>()
+        {
+            @Override
+            public int compare(MatOfPoint o1, MatOfPoint o2)
+            {
+                double area1 = contourArea(o1);
+                double area2 = contourArea(o2);
+                return area1 < area2 ? 1 : area1 > area2 ? -1 : 0;
+            }
+        });*/
+
+        for (MatOfPoint contour : contours)
+        {
+            Imgproc.drawContours
+                    (
+                            puzzle,
+                            Arrays.asList(contour),
+                            0,
+                            new Scalar(0, 0, 255),
+                            1,
+                            BORDER_ISOLATED,
+                            hierarchy,
+                            0,
+                            new Point(pieceMatch.getMatchPoint().x - pieceMatch.getWidth(), pieceMatch.getMatchPoint().y - pieceMatch.getHeight())
+                    );
+        }
+
+
     }
 }
