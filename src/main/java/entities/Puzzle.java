@@ -1,26 +1,31 @@
 package entities;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
 import org.opencv.core.Mat;
 
-public class Puzzle {
+public class Puzzle
+{
+    private final Mat completePuzzle;
+    private final List<PuzzlePiece> pieces;
 
-    public final Mat       completePuzzle;
-    public final List<Mat> pieces;
-
-    public Puzzle(Mat puzzle, List<Mat> pieces) {
-	this.completePuzzle = puzzle;
-	this.pieces = Collections.unmodifiableList(pieces);
+    public Puzzle(Mat puzzle, List<PuzzlePiece> pieces)
+    {
+        this.completePuzzle = puzzle;
+        this.pieces = ImmutableList.copyOf(pieces);
     }
 
-    public Mat getCompletePuzzle() {
-	return this.completePuzzle;
+    public Mat getCompletePuzzle()
+    {
+        return this.completePuzzle;
     }
 
-    public List<Mat> getPieces() {
-	return this.pieces;
+    public List<PuzzlePiece> getPieces()
+    {
+        return this.pieces;
     }
 
 }

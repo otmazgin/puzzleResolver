@@ -3,6 +3,7 @@ package assembler;
 import assembler.templateMatcher.FastTemplateMatcher;
 import assembler.templateMatcher.Match;
 import assembler.templateMatcher.TemplateMatcher;
+import entities.PuzzlePiece;
 import org.opencv.core.Mat;
 import org.opencv.core.Rect;
 import org.opencv.core.Size;
@@ -11,14 +12,12 @@ import java.util.concurrent.Callable;
 
 class PuzzlePieceAssembler implements Callable<Match>
 {
-    private final int pieceNumber;
-    private final Mat puzzlePiece;
+    private final PuzzlePiece puzzlePiece;
     private final Mat puzzle;
     private double[] backgroundColor;
 
-    PuzzlePieceAssembler(int pieceNumber, Mat puzzlePiece, Mat puzzle, double[] backgroundColor)
+    PuzzlePieceAssembler(PuzzlePiece puzzlePiece, Mat puzzle, double[] backgroundColor)
     {
-        this.pieceNumber = pieceNumber;
         this.puzzlePiece = puzzlePiece;
         this.puzzle = puzzle;
         this.backgroundColor = backgroundColor;
@@ -27,15 +26,19 @@ class PuzzlePieceAssembler implements Callable<Match>
     @Override
     public Match call() throws Exception
     {
+        int pieceNumber = puzzlePiece.getPieceNumber();
+
         System.out.println("Started assembling piece number: " + pieceNumber);
 
-        PuzzlePieceRestorer.instance.restoreMissingGaps(puzzlePiece, backgroundColor);
+        Mat transformedPieceMatrix = puzzlePiece.getTransformedPieceMatrix();
+
+        PuzzlePieceRestorer.instance.restoreMissingGaps(transformedPieceMatrix, backgroundColor);
 
         //Match bestMatch = TemplateMatcher.instance.findBestMatch(puzzle, puzzlePiece);
-        Match bestMatch = FastTemplateMatcher.instance.findBestMatch(puzzle, puzzlePiece, 3);
+        Match bestMatch = FastTemplateMatcher.instance.findBestMatch(puzzle, transformedPieceMatrix, 3);
 
         int numOfRotations = 0;
-        Mat rotatedPuzzlePiece = puzzlePiece;
+        Mat rotatedPuzzlePiece = transformedPieceMatrix;
         Match rotationBestMatch;
 
         while (numOfRotations <= 3)
@@ -63,8 +66,8 @@ class PuzzlePieceAssembler implements Callable<Match>
         return bestMatch;
     }
 
-    static Callable<Match> createAssembler(int pieceNumber, Mat puzzlePiece, Mat puzzle, double[] backgroundColor)
+    static Callable<Match> createAssembler(PuzzlePiece puzzlePiece, Mat puzzle, double[] backgroundColor)
     {
-        return new PuzzlePieceAssembler(pieceNumber, puzzlePiece, puzzle, backgroundColor);
+        return new PuzzlePieceAssembler(puzzlePiece, puzzle, backgroundColor);
     }
 }

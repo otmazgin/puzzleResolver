@@ -2,6 +2,8 @@ package assembler;
 
 import assembler.templateMatcher.Match;
 import com.google.common.collect.Maps;
+import entities.Puzzle;
+import entities.PuzzlePiece;
 import org.opencv.core.*;
 import utillities.Utilities;
 import utillities.ValueFromFuture;
@@ -20,21 +22,20 @@ public enum PuzzleAssembler
 
     private static final int numberOfCPUCores = 4;
 
-    public Map<Integer, Match> assemblePieces(Map<Integer, Mat> puzzlePieces, Mat puzzle, double[] backgroundColor) throws Exception
+    public Map<PuzzlePiece, Match> assemble(Puzzle puzzle, double[] backgroundColor) throws Exception
     {
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfCPUCores);
 
-        Map<Integer, Future<Match>> futures = new HashMap<>();
+        Map<PuzzlePiece, Future<Match>> futures = new HashMap<>();
 
-        for (Map.Entry<Integer, Mat> puzzlePiece : puzzlePieces.entrySet())
+        for (PuzzlePiece puzzlePiece : puzzle.getPieces())
         {
             futures.put
                     (
-                            puzzlePiece.getKey(),
-
+                            puzzlePiece,
                             executorService.submit
                                     (
-                                            PuzzlePieceAssembler.createAssembler(puzzlePiece.getKey(), puzzlePiece.getValue(), puzzle, backgroundColor)
+                                            PuzzlePieceAssembler.createAssembler(puzzlePiece, puzzle.getCompletePuzzle(), backgroundColor)
                                     )
                     );
         }

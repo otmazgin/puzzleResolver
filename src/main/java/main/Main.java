@@ -8,13 +8,12 @@ import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
-import pieceRecognizer.PuzzlePiece;
+import entities.PuzzlePiece;
 import pieceRecognizer.PuzzlePieceCornerDetector;
 import pieceRecognizer.PuzzlePieceDetector;
 import transformations.PuzzlePieceTransformer;
 import utillities.Utilities;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -55,26 +54,19 @@ public class Main
     {
         Utilities.writeImageToFile(puzzle.getCompletePuzzle(), "p0.jpg");
         int i = 1;
-        for (Mat piece : puzzle.getPieces())
+
+        for (PuzzlePiece puzzlePiece : puzzle.getPieces())
         {
-            Utilities.writeImageToFile(piece, "P" + i + ".jpg");
+            Utilities.writeImageToFile(puzzlePiece.getTransformedPieceMatrix(), "P" + i + ".jpg");
             i++;
         }
     }
 
     private static void assembleAndDraw(Puzzle puzzle) throws Exception
     {
-        Map<Integer, Mat> puzzlePieces = new HashMap<>();
-
-        int index = 1;
-        for (Mat piece : puzzle.getPieces())
-        {
-            puzzlePieces.put(index++, piece);
-        }
-
-        Map<Integer, Match> piecesMatches = PuzzleAssembler.instance.assemblePieces
+        Map<PuzzlePiece, Match> piecesMatches = PuzzleAssembler.instance.assemble
                 (
-                        puzzlePieces, puzzle.getCompletePuzzle(), new double[]{101, 224, 180}
+                        puzzle, new double[]{101, 224, 180}
                 );
 
         PuzzleMatchesDrawer.instance.drawMatches(piecesMatches, puzzle.getCompletePuzzle());

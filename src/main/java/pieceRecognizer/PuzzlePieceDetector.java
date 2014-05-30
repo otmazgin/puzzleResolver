@@ -3,6 +3,7 @@ package pieceRecognizer;
 import java.util.ArrayList;
 import java.util.List;
 
+import entities.PuzzlePiece;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;

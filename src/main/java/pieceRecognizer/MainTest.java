@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
+import entities.PuzzlePiece;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.highgui.Highgui;

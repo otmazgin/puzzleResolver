@@ -1,12 +1,12 @@
-background_h_min=70
+background_h_min=80
 background_s_min=0
-background_v_min=100
-background_h_max=90
-background_s_max=180
+background_v_min=000
+background_h_max=100
+background_s_max=255
 background_v_max=255
 Haris_apertureSize=5
 Haris_k=0.05
 Haris_blockSize=2
 Haris_threashHold=0
-src_pic=test20.jpg
+src_pic=test104.jpg
 auto_color_detect=False
