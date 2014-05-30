@@ -5,8 +5,6 @@ import assembler.templateMatcher.Match;
 import assembler.templateMatcher.TemplateMatcher;
 import entities.PuzzlePiece;
 import org.opencv.core.Mat;
-import org.opencv.core.Rect;
-import org.opencv.core.Size;
 
 import java.util.concurrent.Callable;
 
@@ -36,6 +34,7 @@ class PuzzlePieceAssembler implements Callable<Match>
 
         //Match bestMatch = TemplateMatcher.instance.findBestMatch(puzzle, puzzlePiece);
         Match bestMatch = FastTemplateMatcher.instance.findBestMatch(puzzle, transformedPieceMatrix, 3);
+        puzzlePiece.setBestRotationAngle(0);
 
         int numOfRotations = 0;
         Mat rotatedPuzzlePiece = transformedPieceMatrix;
@@ -46,6 +45,7 @@ class PuzzlePieceAssembler implements Callable<Match>
             if (bestMatch.getMatchValue() > 0.99)
             {
                 System.out.println("Finished assembling piece number: " + pieceNumber);
+                puzzlePiece.setBestRotationAngle(numOfRotations * 90);
                 return bestMatch;
             }
 
@@ -55,6 +55,7 @@ class PuzzlePieceAssembler implements Callable<Match>
 
             if (rotationBestMatch.compareTo(bestMatch) > 0)
             {
+                puzzlePiece.setBestRotationAngle(numOfRotations * 90);
                 bestMatch = rotationBestMatch;
             }
 

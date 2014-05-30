@@ -26,4 +26,17 @@ enum ImageRotator
 
         return rotatedTemplate;
     }
+
+    Mat rotate(Mat image, double degrees)
+    {
+        int numOfRotations = (int)degrees % 90;
+        Mat result = image;
+
+        for (int i = 1; i<=numOfRotations; i++)
+        {
+           result = rotateLeft(image);
+        }
+
+        return result;
+    }
 }
