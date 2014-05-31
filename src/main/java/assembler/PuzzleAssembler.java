@@ -4,12 +4,9 @@ import assembler.templateMatcher.Match;
 import com.google.common.collect.Maps;
 import entities.Puzzle;
 import entities.PuzzlePiece;
-import org.opencv.core.*;
-import utillities.Utilities;
 import utillities.ValueFromFuture;
 
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -22,7 +19,7 @@ public enum PuzzleAssembler
 
     private static final int numberOfCPUCores = 4;
 
-    public Map<PuzzlePiece, Match> assemble(Puzzle puzzle, double[] backgroundColor) throws Exception
+    public Map<PuzzlePiece, Match> assemble(Puzzle puzzle) throws Exception
     {
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfCPUCores);
 
@@ -35,7 +32,7 @@ public enum PuzzleAssembler
                             puzzlePiece,
                             executorService.submit
                                     (
-                                            PuzzlePieceAssembler.createAssembler(puzzlePiece, puzzle.getCompletePuzzle(), backgroundColor)
+                                            PuzzlePieceAssembler.createAssembler(puzzlePiece, puzzle.getCompletePuzzle())
                                     )
                     );
         }

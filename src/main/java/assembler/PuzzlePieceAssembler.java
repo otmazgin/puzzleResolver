@@ -12,13 +12,11 @@ class PuzzlePieceAssembler implements Callable<Match>
 {
     private final PuzzlePiece puzzlePiece;
     private final Mat puzzle;
-    private double[] backgroundColor;
 
-    PuzzlePieceAssembler(PuzzlePiece puzzlePiece, Mat puzzle, double[] backgroundColor)
+    PuzzlePieceAssembler(PuzzlePiece puzzlePiece, Mat puzzle)
     {
         this.puzzlePiece = puzzlePiece;
         this.puzzle = puzzle;
-        this.backgroundColor = backgroundColor;
     }
 
     @Override
@@ -30,7 +28,7 @@ class PuzzlePieceAssembler implements Callable<Match>
 
         Mat transformedPieceMatrix = puzzlePiece.getTransformedPieceMatrix();
 
-        PuzzlePieceRestorer.instance.restoreMissingGaps(transformedPieceMatrix, backgroundColor);
+        //PuzzlePieceRestorer.instance.restoreMissingGaps(transformedPieceMatrix, puzzlePiece.getOriginalSource());
 
         //Match bestMatch = TemplateMatcher.instance.findBestMatch(puzzle, transformedPieceMatrix);
         Match bestMatch = FastTemplateMatcher.instance.findBestMatch(puzzle, transformedPieceMatrix, 3);
@@ -67,8 +65,8 @@ class PuzzlePieceAssembler implements Callable<Match>
         return bestMatch;
     }
 
-    static Callable<Match> createAssembler(PuzzlePiece puzzlePiece, Mat puzzle, double[] backgroundColor)
+    static Callable<Match> createAssembler(PuzzlePiece puzzlePiece, Mat puzzle)
     {
-        return new PuzzlePieceAssembler(puzzlePiece, puzzle, backgroundColor);
+        return new PuzzlePieceAssembler(puzzlePiece, puzzle);
     }
 }

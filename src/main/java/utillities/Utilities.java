@@ -3,10 +3,8 @@ package utillities;
 import org.opencv.core.*;
 import org.opencv.highgui.Highgui;
 
-import java.io.*;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.List;
-import java.util.SortedMap;
 
 public class Utilities
 {
@@ -41,6 +39,11 @@ public class Utilities
         }
 
         return image;
+    }
+
+    public static void drawPoint(Point point, Mat image)
+    {
+        Core.line(image, point, new Point(point.x, point.y + 1), new Scalar(0, 0, 0), 5);
     }
 
     public static void drawRect(Rect rect, Mat image)

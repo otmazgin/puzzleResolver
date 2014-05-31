@@ -66,55 +66,38 @@ public enum PuzzleMatchesDrawer
 
         Mat rotatedPiece = ImageRotator.instance.rotate(puzzlePiece.getRotatedImage(), bestRotationAngle);
 
-        Utilities.writeImageToFile(rotatedPiece, "rotated" + puzzlePiece.getPieceNumber() + ".jpg");
-
         cvtColor(rotatedPiece, rotatedPiece, COLOR_RGB2GRAY);
 
-        threshold( rotatedPiece, rotatedPiece, 120, 200, THRESH_BINARY );
-        //Canny(rotatedPiece, rotatedPiece, 100, 200);
+        Mat originalInGray = new Mat();
+        cvtColor(puzzlePiece.getOriginalSource(), originalInGray, COLOR_RGB2GRAY);
+        double backgroundColor = BackgroundExtractor.instance.calcBackgroundFromSource(originalInGray);
 
-        Utilities.writeImageToFile(rotatedPiece, "rotatedCanny" + puzzlePiece.getPieceNumber() + ".jpg");
-
-        findContours( rotatedPiece, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE, new Point(0, 0) );
-
-/*        double maxArea = 0;
-        double secondMaxArea = 0;
-        MatOfPoint pieceContour = null;
-        for (MatOfPoint contour : contours)
+        for (int row = 0; row < rotatedPiece.rows(); row++)
         {
-            double contourArea = Imgproc.contourArea(contour);
-
-            if (contourArea > maxArea)
+            for (int column = 0; column < rotatedPiece.cols(); column++)
             {
-                maxArea = contourArea;
-            }
-            else
-            {
-                if (contourArea > secondMaxArea)
+                if (Math.abs(rotatedPiece.get(row, column)[0] - backgroundColor) < 50 || rotatedPiece.get(row, column)[0]<=127)
                 {
-                    pieceContour = contour;
-                    secondMaxArea = contourArea;
+                    rotatedPiece.put(row, column, 0);
+                }
+                else
+                {
+                    rotatedPiece.put(row, column, 255);
                 }
             }
-        }
-        Collections.sort(contours, new Comparator<MatOfPoint>()
-        {
-            @Override
-            public int compare(MatOfPoint o1, MatOfPoint o2)
-            {
-                double area1 = contourArea(o1);
-                double area2 = contourArea(o2);
-                return area1 < area2 ? 1 : area1 > area2 ? -1 : 0;
-            }
-        });*/
 
-        for (MatOfPoint contour : contours)
+        }
+        Utilities.writeImageToFile(rotatedPiece, "binary" + puzzlePiece.getPieceNumber() + ".jpg");
+
+        findContours(rotatedPiece, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE, new Point(0, 0));
+
+        for (int i = 0; i<contours.size(); i++)
         {
             Imgproc.drawContours
                     (
                             puzzle,
-                            Arrays.asList(contour),
-                            0,
+                            contours,
+                            i,
                             new Scalar(0, 0, 255),
                             1,
                             BORDER_ISOLATED,

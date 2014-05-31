@@ -1,16 +1,10 @@
 package assembler;
 
 import org.opencv.core.*;
-import org.opencv.imgproc.Imgproc;
 import utillities.Utilities;
 
-import java.awt.*;
-import java.awt.Point;
-import java.util.*;
-import java.util.List;
-
-import static org.opencv.imgproc.Imgproc.*;
-import static org.opencv.photo.Photo.INPAINT_NS;
+import static org.opencv.imgproc.Imgproc.COLOR_RGB2GRAY;
+import static org.opencv.imgproc.Imgproc.cvtColor;
 import static org.opencv.photo.Photo.INPAINT_TELEA;
 import static org.opencv.photo.Photo.inpaint;
 
@@ -18,98 +12,170 @@ enum PuzzlePieceRestorer
 {
     instance;
 
-    private static final int distanceFromBackgroundColorThreshold = 10;
+    private static final int threshold = 5;
 
-    void restoreMissingGaps(Mat puzzlePiece, double[] backgroundColor)
+    void restoreMissingGaps(Mat puzzlePiece, Mat originalPiecesImage)
     {
         Mat maskOfGaps = new Mat(puzzlePiece.size(), CvType.CV_8U);
 
-        findLeftMiddleGap(puzzlePiece, backgroundColor, maskOfGaps);
-        findUpMiddleGap(puzzlePiece, backgroundColor, maskOfGaps);
-        findDownMiddleGap(puzzlePiece, backgroundColor, maskOfGaps);
-        findRightMiddleGap(puzzlePiece, backgroundColor, maskOfGaps);
+        Mat originalInGray = new Mat();
+        cvtColor(originalPiecesImage, originalInGray, COLOR_RGB2GRAY);
+        Utilities.writeImageToFile(originalInGray, "grayPieces.jpg");
+        Mat puzzlePieceInGray = new Mat();
+        cvtColor(puzzlePiece, puzzlePieceInGray, COLOR_RGB2GRAY);
+        Utilities.writeImageToFile(puzzlePieceInGray, "grayPiece.jpg");
+
+        double backgroundColor = BackgroundExtractor.instance.calcBackgroundFromSource(originalInGray);
+
+        fillMaskAtLeftGap(puzzlePieceInGray, backgroundColor, maskOfGaps);
+        fillMaskAtRightGap(puzzlePieceInGray, backgroundColor, maskOfGaps);
+        fillMaskAtUpGap(puzzlePieceInGray, backgroundColor, maskOfGaps);
+        fillMaskAtDownGap(puzzlePieceInGray, backgroundColor, maskOfGaps);
 
         inpaint(puzzlePiece, maskOfGaps, puzzlePiece, 1, INPAINT_TELEA);
 
-        //Utilities.writeImageToFile(puzzlePiece, "inpainted" + (int) (100 * Math.random()) + ".jpg");
+        //Utilities.writeImageToFile(maskOfGaps, "mask" + (int) (100 * Math.random()) + ".jpg");
+        //up
+        Utilities.drawRect(new Rect(puzzlePiece.cols()/3, 0, puzzlePiece.cols()/3, puzzlePiece.rows()/3), puzzlePiece);
+        //down
+        Utilities.drawRect(new Rect(puzzlePiece.cols()/3, 2*(puzzlePiece.rows()/3), puzzlePiece.cols()/3, puzzlePiece.rows()/3), puzzlePiece);
+        //left
+        Utilities.drawRect(new Rect(0, puzzlePiece.rows()/3, puzzlePiece.cols()/3, puzzlePiece.rows()/3), puzzlePiece);
+        //right
+        Utilities.drawRect(new Rect(2*(puzzlePiece.cols()/3), puzzlePiece.rows()/3, puzzlePiece.cols()/3, puzzlePiece.rows()/3), puzzlePiece);
+        Utilities.writeImageToFile(puzzlePiece, "inpainted" + (int) (100 * Math.random()) + ".jpg");
     }
 
-    private void findLeftMiddleGap(Mat puzzlePiece, double[] backgroundColor, Mat maskOfGaps)
-    {
-        if (euclideanDistance(puzzlePiece.get(puzzlePiece.height() / 2, 10), backgroundColor) <= distanceFromBackgroundColorThreshold)
-        {
-            inpaintGapIfExists(puzzlePiece, maskOfGaps, new Point(0, puzzlePiece.height() / 4), backgroundColor);
-        }
-    }
 
-    private void findUpMiddleGap(Mat puzzlePiece, double[] backgroundColor, Mat maskOfGaps)
+    private void fillMaskAtLeftGap(Mat puzzlePieceInGray, double backgroundColor, Mat maskOfGaps)
     {
-        if (euclideanDistance(puzzlePiece.get(10, puzzlePiece.width() / 2), backgroundColor) <= distanceFromBackgroundColorThreshold)
+        if (Math.abs(puzzlePieceInGray.get(puzzlePieceInGray.height() / 2, 60)[0] - backgroundColor) <= threshold)
         {
-            inpaintGapIfExists(puzzlePiece, maskOfGaps, new Point(puzzlePiece.width() / 4, 0), backgroundColor);
-        }
-    }
-
-    private void findDownMiddleGap(Mat puzzlePiece, double[] backgroundColor, Mat maskOfGaps)
-    {
-        if (euclideanDistance(puzzlePiece.get(puzzlePiece.height() - 10, puzzlePiece.width() / 2), backgroundColor) <= distanceFromBackgroundColorThreshold)
-        {
-            inpaintGapIfExists(puzzlePiece, maskOfGaps, new Point(puzzlePiece.width() / 4, puzzlePiece.height() / 2), backgroundColor);
-        }
-    }
-
-    private void findRightMiddleGap(Mat puzzlePiece, double[] backgroundColor, Mat maskOfGaps)
-    {
-        if (euclideanDistance(puzzlePiece.get(puzzlePiece.height() / 2, puzzlePiece.width() - 10), backgroundColor) <= distanceFromBackgroundColorThreshold)
-        {
-            inpaintGapIfExists(puzzlePiece, maskOfGaps, new Point(puzzlePiece.width() / 2, puzzlePiece.height() / 4), backgroundColor);
-        }
-    }
-
-    private void inpaintGapIfExists(Mat puzzlePiece, Mat maskOfGaps, Point suspectedGapStart, double[] backgroundColor)
-    {
-        //List<org.opencv.core.Point> chosenPoints = new ArrayList<>();
-
-        for (int row = suspectedGapStart.y; row < suspectedGapStart.y + puzzlePiece.height() / 2; row++)
-        {
-            for (int column = suspectedGapStart.x; column < suspectedGapStart.x + puzzlePiece.width() / 2; column++)
+            for (int i = puzzlePieceInGray.rows() / 3; i < 2 * (puzzlePieceInGray.rows() / 3); i++)
             {
-                if (euclideanDistance(puzzlePiece.get(row, column), backgroundColor) < 30)
+                for (int j = 0; j < puzzlePieceInGray.cols() / 3; j++)
                 {
-                    //chosenPoints.add(new org.opencv.core.Point(column, row));
-                    maskOfGaps.put(row, column, 1);
-                } else
-                {
-                    maskOfGaps.put(row, column, 0);
+                    maskOfGaps.put(i, j, 1);
                 }
             }
-        }
-/*        org.opencv.core.Point[] arrayOfPoints = new org.opencv.core.Point[chosenPoints.size()];
-        Rect rect = boundingRect(new MatOfPoint(chosenPoints.toArray(arrayOfPoints)));
-        Utilities.drawRect(rect, puzzlePiece);
+            /*int row = puzzlePieceInGray.height() / 2;
+            int column = 0;
+            int index = 0;
 
-        for (int row = rect.y - 10; row < rect.y + rect.height + 10; row++)
-        {
-            for (int column = rect.x - 10; column < rect.x + rect.width + 10; column++)
+            while (Math.abs(puzzlePieceInGray.get(row, column)[0] - backgroundColor) <= threshold &&
+                    (column < puzzlePieceInGray.width() / 2))
             {
-                maskOfGaps.put(row, column, 1);
-            }
-        }*/
+                while (Math.abs(puzzlePieceInGray.get(row, column)[0] - backgroundColor) <= threshold &&
+                        (row + index < puzzlePieceInGray.height()))
+                {
+                    maskOfGaps.put(row - index, column, 1);
+                    maskOfGaps.put(row + index, column, 1);
+                    index++;
+                }
+
+                row = puzzlePieceInGray.height() / 2;
+                column++;
+            }*/
+        }
     }
 
-    private double euclideanDistance(double[] first, double[] second)
+    private void fillMaskAtRightGap(Mat puzzlePieceInGray, double backgroundColor, Mat maskOfGaps)
     {
-        if (first.length != second.length)
+        if (Math.abs(puzzlePieceInGray.get(puzzlePieceInGray.height() / 2, puzzlePieceInGray.width() - 60)[0] - backgroundColor) <= threshold)
         {
-            throw new RuntimeException("Euclidean distance: color dimensions are not the same");
-        }
+            for (int i = puzzlePieceInGray.rows() / 3; i < 2 * (puzzlePieceInGray.rows() / 3); i++)
+            {
+                for (int j = 2 * (puzzlePieceInGray.cols() / 3); j < puzzlePieceInGray.cols(); j++)
+                {
+                    maskOfGaps.put(i, j, 1);
+                }
+            }
+            /*int row = puzzlePieceInGray.height() / 2;
+            int column = puzzlePieceInGray.width();
+            int index = 0;
 
-        int sumSquares = 0;
-        for (int dimension = 0; dimension < first.length; dimension++)
+            while (Math.abs(puzzlePieceInGray.get(row, column)[0] - backgroundColor) <= threshold &&
+                    (column > puzzlePieceInGray.width() / 2))
+            {
+                while (Math.abs(puzzlePieceInGray.get(row + index, column)[0] - backgroundColor) <= threshold &&
+                        (row + index < puzzlePieceInGray.height()))
+                {
+                    maskOfGaps.put(row - index, column, 1);
+                    maskOfGaps.put(row + index, column, 1);
+                    index++;
+                }
+
+                row = puzzlePieceInGray.height() / 2;
+                column--;
+            }*/
+        }
+    }
+
+    private void fillMaskAtUpGap(Mat puzzlePieceInGray, double backgroundColor, Mat maskOfGaps)
+    {
+        if (Math.abs(puzzlePieceInGray.get(60, puzzlePieceInGray.width() / 2)[0] - backgroundColor) <= threshold)
         {
-            sumSquares += Math.pow(first[dimension] - second[dimension], 2);
-        }
+            for (int i = 0; i < puzzlePieceInGray.rows() / 3; i++)
+            {
+                for (int j = puzzlePieceInGray.cols() / 3; j < 2 * (puzzlePieceInGray.cols() / 3); j++)
+                {
+                    maskOfGaps.put(i, j, 1);
+                }
+            }
 
-        return Math.sqrt(sumSquares);
+            /*int row = 0;
+            int column = puzzlePieceInGray.width() / 2;
+            int index = 0;
+
+            while (Math.abs(puzzlePieceInGray.get(row, column)[0] - backgroundColor) <= threshold &&
+                    (row < puzzlePieceInGray.height() / 2))
+            {
+                while (Math.abs(puzzlePieceInGray.get(row, column + index)[0] - backgroundColor) <= threshold &&
+                        (column + index < puzzlePieceInGray.width()))
+                {
+                    maskOfGaps.put(row, column - index, 1);
+                    maskOfGaps.put(row, column + index, 1);
+                    Utilities.drawPoint(new Point(column - index, row), puzzlePieceInGray);
+                    Utilities.drawPoint(new Point(column + index, row), puzzlePieceInGray);
+
+                    index++;
+                }
+
+                column = puzzlePieceInGray.width() / 2;
+                row++;
+            }*/
+        }
+    }
+
+    private void fillMaskAtDownGap(Mat puzzlePieceInGray, double backgroundColor, Mat maskOfGaps)
+    {
+        if (Math.abs(puzzlePieceInGray.get(puzzlePieceInGray.height() - 60, puzzlePieceInGray.width() / 2)[0] - backgroundColor) <= threshold)
+        {
+            for (int i = 2 * (puzzlePieceInGray.rows() / 3); i < puzzlePieceInGray.rows(); i++)
+            {
+                for (int j = puzzlePieceInGray.cols() / 3; j < 2 * (puzzlePieceInGray.cols() / 3); j++)
+                {
+                    maskOfGaps.put(i, j, 1);
+                }
+            }
+            /*int row = puzzlePieceInGray.height();
+            int column = puzzlePieceInGray.width() / 2;
+            int index = 0;
+
+            while (Math.abs(puzzlePieceInGray.get(row, column)[0] - backgroundColor) <= threshold &&
+                    (row > puzzlePieceInGray.height() / 2))
+            {
+                while (Math.abs(puzzlePieceInGray.get(row, column + index)[0] - backgroundColor) <= threshold &&
+                        (column + index < puzzlePieceInGray.width()))
+                {
+                    maskOfGaps.put(row, column - index, 1);
+                    maskOfGaps.put(row, column + index, 1);
+                    index++;
+                }
+
+                column = puzzlePieceInGray.width() / 2;
+                row--;
+            }*/
+        }
     }
 }
