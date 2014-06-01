@@ -45,25 +45,24 @@ public class Main
         boolean isWithInpainting = Boolean.parseBoolean(prop.getProperty("with_inpainting"));
         boolean matchingByPyramids = Boolean.parseBoolean(prop.getProperty("matching_by_pyramids"));
 
-        //TODO: get the correct files:
-        Mat piecesImage = Utilities.readImage("test20.jpg");
-        Mat puzzleImg = Utilities.readImage("IMG_1062.jpg");
+        Mat puzzleImage = Utilities.readImage(args[0]);
+        Mat piecesImage = Utilities.readImage(args[1]);
 
-        puzzleImg = new Mat(puzzleImg, new Rect(new Point(249, 2277), new Point(3062, 308)));
+        //puzzleImage = new Mat(puzzleImage, new Rect(new Point(249, 2277), new Point(3062, 308)));
 
         List<PuzzlePiece> pieces = PuzzlePieceDetector.pieceDetector
                 (piecesImage, hueMin, saturationMin, valueMin, hueMax, saturationMax, valueMax, auto_color_detect);
 
-        int count = 1;
+        //int count = 1;
         for (PuzzlePiece puzzlePiece : pieces)
         {
-            PuzzlePieceCornerDetector.cornerFindeByQuaters(harisBlockSize, harisApertureSize, harisK,
-                    harisThreashHold, puzzlePiece);
-            Utilities.writeImageToFile(puzzlePiece.getPiece(), "BP" + count + ".jpg");
-            count++;
+            PuzzlePieceCornerDetector.cornerFindeByQuaters
+                    (harisBlockSize, harisApertureSize, harisK, harisThreashHold, puzzlePiece);
+            //Utilities.writeImageToFile(puzzlePiece.getPiece(), "BP" + count + ".jpg");
+            //count++;
         }
 
-        Puzzle puzzle = PuzzlePieceTransformer.instance.transformPieces(puzzleImg, pieces, 5, 4);
+        Puzzle puzzle = PuzzlePieceTransformer.instance.transformPieces(puzzleImage, pieces, 5, 4);
         //writePiecesAndPuzzle(puzzle);
 
         Map<PuzzlePiece, Match> piecesMatches = PuzzleAssembler.instance.assemble(puzzle, isWithInpainting, matchingByPyramids);
