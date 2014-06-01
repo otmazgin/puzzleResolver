@@ -10,3 +10,5 @@ Haris_blockSize=2
 Haris_threashHold=0
 src_pic=test104.jpg
 auto_color_detect=False
+with_inpainting=True
+matching_by_pyramids=True

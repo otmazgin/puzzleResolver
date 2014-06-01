@@ -19,7 +19,7 @@ public enum PuzzleAssembler
 
     private static final int numberOfCPUCores = 4;
 
-    public Map<PuzzlePiece, Match> assemble(Puzzle puzzle) throws Exception
+    public Map<PuzzlePiece, Match> assemble(Puzzle puzzle, boolean isWithInpainting, boolean matchingByPyramids) throws Exception
     {
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfCPUCores);
 
@@ -32,7 +32,7 @@ public enum PuzzleAssembler
                             puzzlePiece,
                             executorService.submit
                                     (
-                                            PuzzlePieceAssembler.createAssembler(puzzlePiece, puzzle.getCompletePuzzle())
+                                            PuzzlePieceAssembler.createAssembler(puzzlePiece, puzzle.getCompletePuzzle(), isWithInpainting, matchingByPyramids)
                                     )
                     );
         }
