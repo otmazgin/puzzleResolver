@@ -15,106 +15,126 @@ import org.opencv.imgproc.Imgproc;
 
 import pieceRecognizer.Corner;
 
-public class PuzzlePiece {
-    private static Scalar      wColor     = new Scalar(255, 255, 255);
-    private static int	 pieceIndex = 1;
+public class PuzzlePiece
+{
+    private static Scalar wColor = new Scalar(255, 255, 255);
+    private static int pieceIndex = 1;
 
-    private final int	  pieceNumber;
-    private final Mat	  originalSource;
-    private final Mat	  mask;
-    private final Mat	  hierarchy;
-    private final MatOfPoint   contoure;
+    private final int pieceNumber;
+    private final Mat originalSource;
+    private final Mat mask;
+    private final Mat hierarchy;
+    private final MatOfPoint contoure;
     private final List<Corner> cornersList;
 
-    private Rect	       rect;
-    private Mat		transformedPieceMatrix;
-    private double	     bestRotationAngle;
-    private Mat		rotatedImage;
+    private Rect rect;
+    private Mat transformedPieceMatrix;
+    private double bestRotationAngle;
+    private Mat rotatedImage;
 
-    public PuzzlePiece(Mat originalSrc, MatOfPoint contoure, Mat hierarchy) {
-	this.pieceNumber = pieceIndex++;
-	this.originalSource = originalSrc;
-	this.contoure = contoure;
-	this.hierarchy = hierarchy;
-	this.mask = new Mat(originalSrc.size(), CvType.CV_8UC3);
-	Imgproc.drawContours(this.mask, Arrays.asList(contoure), 0, wColor, -1, 1, this.hierarchy, 0,
-		new Point());
-	this.rect = Imgproc.boundingRect(contoure);
-	this.cornersList = new ArrayList<>();
+    public PuzzlePiece(Mat originalSrc, MatOfPoint contoure, Mat hierarchy)
+    {
+        this.pieceNumber = pieceIndex++;
+        this.originalSource = originalSrc;
+        this.contoure = contoure;
+        this.hierarchy = hierarchy;
+        this.mask = new Mat(originalSrc.size(), CvType.CV_8UC3);
+        Imgproc.drawContours(this.mask, Arrays.asList(contoure), 0, wColor, -1, 1, this.hierarchy, 0,
+                new Point());
+        this.rect = Imgproc.boundingRect(contoure);
+        this.cornersList = new ArrayList<>();
     }
 
-    public int getPieceNumber() {
-	return this.pieceNumber;
+    public int getPieceNumber()
+    {
+        return this.pieceNumber;
     }
 
-    public Mat getOriginalSource() {
-	return this.originalSource;
+    public Mat getOriginalSource()
+    {
+        return this.originalSource;
     }
 
-    public Mat getMask() {
-	return this.mask;
+    public Mat getMask()
+    {
+        return this.mask;
     }
 
-    public Mat getHierarchy() {
-	return this.hierarchy;
+    public Mat getHierarchy()
+    {
+        return this.hierarchy;
     }
 
-    public Rect getRect() {
-	return this.rect;
+    public Rect getRect()
+    {
+        return this.rect;
     }
 
-    public void setRect(Rect rect) {
-	this.rect = rect;
+    public void setRect(Rect rect)
+    {
+        this.rect = rect;
     }
 
-    public MatOfPoint getcontoure() {
-	return this.contoure;
+    public MatOfPoint getcontoure()
+    {
+        return this.contoure;
     }
 
-    public List<Corner> getCornersList() {
-	return this.cornersList;
+    public List<Corner> getCornersList()
+    {
+        return this.cornersList;
     }
 
-    public Mat getTransformedPieceMatrix() {
-	return this.transformedPieceMatrix;
+    public Mat getTransformedPieceMatrix()
+    {
+        return this.transformedPieceMatrix;
     }
 
-    public void setTransformedPieceMatrix(Mat transformedPieceMatrix) {
-	this.transformedPieceMatrix = transformedPieceMatrix;
+    public void setTransformedPieceMatrix(Mat transformedPieceMatrix)
+    {
+        this.transformedPieceMatrix = transformedPieceMatrix;
     }
 
-    public Mat getPiece() {
-	return new Mat(this.originalSource, this.rect);
+    public Mat getPiece()
+    {
+        return new Mat(this.originalSource, this.rect);
     }
 
-    public void drawPiece(Mat drawing) {
-	Imgproc.drawContours(drawing, Arrays.asList(getcontoure()), 0, wColor, -1, 1, getHierarchy(), 0,
-		new Point());
+    public void drawPiece(Mat drawing)
+    {
+        Imgproc.drawContours(drawing, Arrays.asList(getcontoure()), 0, wColor, -1, 1, getHierarchy(), 0,
+                new Point());
     }
 
-    public void drawCorners(Mat drawing) {
-	for (Corner corner : getCornersList()) {
-	    Core.circle(drawing, new Point(corner.getX(), corner.getY()), 5, new Scalar(Math.random() * 255),
-		    1, 8, 0);
-	}
+    public void drawCorners(Mat drawing)
+    {
+        for (Corner corner : getCornersList())
+        {
+            Core.circle(drawing, new Point(corner.getX(), corner.getY()), 5, new Scalar(Math.random() * 255),
+                    1, 8, 0);
+        }
     }
 
-    public double getBestRotationAngle() {
-	return this.bestRotationAngle;
+    public double getBestRotationAngle()
+    {
+        return this.bestRotationAngle;
     }
 
-    public void setBestRotationAngle(double bestRotationAngle) {
-	this.bestRotationAngle = bestRotationAngle;
+    public void setBestRotationAngle(double bestRotationAngle)
+    {
+        this.bestRotationAngle = bestRotationAngle;
     }
 
-    public void setRotatedImage(Mat rotatedImage) {
+    public void setRotatedImage(Mat rotatedImage)
+    {
 
-	this.rotatedImage = rotatedImage;
+        this.rotatedImage = rotatedImage;
     }
 
-    public Mat getRotatedImage() {
+    public Mat getRotatedImage()
+    {
 
-	return this.rotatedImage;
+        return this.rotatedImage;
     }
 
 }

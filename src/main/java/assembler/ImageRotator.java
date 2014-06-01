@@ -34,7 +34,7 @@ enum ImageRotator
 
         for (int i = 1; i<=numOfRotations; i++)
         {
-           result = rotateLeft(image);
+           result = rotateLeft(result);
         }
 
         return result;

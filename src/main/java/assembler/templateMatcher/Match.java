@@ -45,8 +45,6 @@ public class Match implements Comparable<Match>
     @Override
     public int compareTo(Match other)
     {
-        int matchValueComparisonResult = getMatchValue().compareTo(other.getMatchValue());
-
-        return matchValueComparisonResult == 0 ? 1 : matchValueComparisonResult;
+        return getMatchValue().compareTo(other.getMatchValue());
     }
 }

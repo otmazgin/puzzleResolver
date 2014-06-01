@@ -63,6 +63,9 @@ public enum PuzzleMatchesDrawer
         Mat hierarchy = new Mat();
 
         double bestRotationAngle = puzzlePiece.getBestRotationAngle();
+        System.out.println("Piece number: " + puzzlePiece.getPieceNumber() + " rotation angle: " + bestRotationAngle);
+
+        //Utilities.writeImageToFile(puzzlePiece.getRotatedImage(), "beforeRotation" + puzzlePiece.getPieceNumber() + ".jpg");
 
         Mat rotatedPiece = ImageRotator.instance.rotate(puzzlePiece.getRotatedImage(), bestRotationAngle);
 
@@ -87,7 +90,7 @@ public enum PuzzleMatchesDrawer
             }
 
         }
-        Utilities.writeImageToFile(rotatedPiece, "binary" + puzzlePiece.getPieceNumber() + ".jpg");
+        //Utilities.writeImageToFile(rotatedPiece, "binary" + puzzlePiece.getPieceNumber() + ".jpg");
 
         findContours(rotatedPiece, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE, new Point(0, 0));
 
