@@ -3,6 +3,9 @@ package assembler;
 import org.opencv.core.*;
 import utillities.Utilities;
 
+import java.awt.*;
+import java.awt.Point;
+
 import static org.opencv.imgproc.Imgproc.COLOR_RGB2GRAY;
 import static org.opencv.imgproc.Imgproc.cvtColor;
 import static org.opencv.photo.Photo.INPAINT_TELEA;
@@ -12,7 +15,7 @@ enum PuzzlePieceRestorer
 {
     instance;
 
-    private static final int threshold = 5;
+    private static final int threshold = 30;
     private static int epsilon = 10;
 
     void restoreMissingGaps(Mat puzzlePiece, Mat originalPiecesImage)
@@ -26,7 +29,7 @@ enum PuzzlePieceRestorer
         cvtColor(puzzlePiece, puzzlePieceInGray, COLOR_RGB2GRAY);
         //Utilities.writeImageToFile(puzzlePieceInGray, "grayPiece.jpg");
 
-        double backgroundColor = BackgroundExtractor.instance.calcBackgroundFromSource(originalInGray);
+        double backgroundColor = AverageColorCalculator.instance.averageBackgroundOfOneDimension(originalInGray);
 
         fillMaskAtLeftGap(puzzlePieceInGray, backgroundColor, maskOfGaps);
         fillMaskAtRightGap(puzzlePieceInGray, backgroundColor, maskOfGaps);
@@ -35,22 +38,19 @@ enum PuzzlePieceRestorer
 
         inpaint(puzzlePiece, maskOfGaps, puzzlePiece, 1, INPAINT_TELEA);
 
-        //Utilities.writeImageToFile(maskOfGaps, "mask" + (int) (100 * Math.random()) + ".jpg");
-        /*//up
-        Utilities.drawRect(new Rect(puzzlePiece.cols()/3, 0, puzzlePiece.cols()/3, puzzlePiece.rows()/3), puzzlePiece);
-        //down
-        Utilities.drawRect(new Rect(puzzlePiece.cols()/3, 2*(puzzlePiece.rows()/3), puzzlePiece.cols()/3, puzzlePiece.rows()/3), puzzlePiece);
-        //left
-        Utilities.drawRect(new Rect(0, puzzlePiece.rows()/3, puzzlePiece.cols()/3, puzzlePiece.rows()/3), puzzlePiece);
-        //right
-        Utilities.drawRect(new Rect(2*(puzzlePiece.cols()/3), puzzlePiece.rows()/3, puzzlePiece.cols()/3, puzzlePiece.rows()/3), puzzlePiece);*/
-        //Utilities.writeImageToFile(puzzlePiece, "inpainted" + (int) (100 * Math.random()) + ".jpg");
+        Utilities.writeImageToFile(puzzlePiece, "inpainted" + (int) (100 * Math.random()) + ".jpg");
     }
 
 
     private void fillMaskAtLeftGap(Mat puzzlePieceInGray, double backgroundColor, Mat maskOfGaps)
     {
-        if (Math.abs(puzzlePieceInGray.get(puzzlePieceInGray.height() / 2, 60)[0] - backgroundColor) <= threshold)
+        double averageAround = AverageColorCalculator.instance.averageAround
+                (
+                        puzzlePieceInGray,
+                        new Point(60, puzzlePieceInGray.height() / 2)
+                );
+
+        if (Math.abs(averageAround - backgroundColor) <= threshold)
         {
             for (int i = puzzlePieceInGray.rows() / 3 - epsilon; i < 2 * (puzzlePieceInGray.rows() / 3) + epsilon; i++)
             {
@@ -64,7 +64,13 @@ enum PuzzlePieceRestorer
 
     private void fillMaskAtRightGap(Mat puzzlePieceInGray, double backgroundColor, Mat maskOfGaps)
     {
-        if (Math.abs(puzzlePieceInGray.get(puzzlePieceInGray.height() / 2, puzzlePieceInGray.width() - 60)[0] - backgroundColor) <= threshold)
+        double averageAround = AverageColorCalculator.instance.averageAround
+                (
+                        puzzlePieceInGray,
+                        new Point(puzzlePieceInGray.width() - 60, puzzlePieceInGray.height() / 2)
+                );
+
+        if (Math.abs(averageAround - backgroundColor) <= threshold)
         {
             for (int i = puzzlePieceInGray.rows() / 3 - epsilon; i < 2 * (puzzlePieceInGray.rows() / 3) + epsilon; i++)
             {
@@ -78,7 +84,13 @@ enum PuzzlePieceRestorer
 
     private void fillMaskAtUpGap(Mat puzzlePieceInGray, double backgroundColor, Mat maskOfGaps)
     {
-        if (Math.abs(puzzlePieceInGray.get(60, puzzlePieceInGray.width() / 2)[0] - backgroundColor) <= threshold)
+        double averageAround = AverageColorCalculator.instance.averageAround
+                (
+                        puzzlePieceInGray,
+                        new Point(puzzlePieceInGray.width() / 2, 60)
+                );
+
+        if (Math.abs(averageAround - backgroundColor) <= threshold)
         {
             for (int i = 0; i < puzzlePieceInGray.rows() / 3 + epsilon; i++)
             {
@@ -92,7 +104,13 @@ enum PuzzlePieceRestorer
 
     private void fillMaskAtDownGap(Mat puzzlePieceInGray, double backgroundColor, Mat maskOfGaps)
     {
-        if (Math.abs(puzzlePieceInGray.get(puzzlePieceInGray.height() - 60, puzzlePieceInGray.width() / 2)[0] - backgroundColor) <= threshold)
+        double averageAround = AverageColorCalculator.instance.averageAround
+                (
+                        puzzlePieceInGray,
+                        new Point(puzzlePieceInGray.width() / 2, puzzlePieceInGray.height() - 60)
+                );
+
+        if (Math.abs(averageAround - backgroundColor) <= threshold)
         {
             for (int i = 2 * (puzzlePieceInGray.rows() / 3) - epsilon; i < puzzlePieceInGray.rows(); i++)
             {

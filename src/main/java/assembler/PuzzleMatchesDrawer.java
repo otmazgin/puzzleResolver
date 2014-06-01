@@ -1,7 +1,6 @@
 package assembler;
 
 import assembler.templateMatcher.Match;
-import com.google.common.collect.ImmutableList;
 import entities.PuzzlePiece;
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
@@ -11,6 +10,7 @@ import java.util.*;
 
 import static org.opencv.core.Core.putText;
 import static org.opencv.imgproc.Imgproc.*;
+import static org.opencv.photo.Photo.fastNlMeansDenoising;
 
 public enum PuzzleMatchesDrawer
 {
@@ -59,42 +59,86 @@ public enum PuzzleMatchesDrawer
         PuzzlePiece puzzlePiece = matchEntry.getKey();
         Match pieceMatch = matchEntry.getValue();
 
-        List<MatOfPoint> contours = new ArrayList<>();
-        Mat hierarchy = new Mat();
-
         double bestRotationAngle = puzzlePiece.getBestRotationAngle();
-        System.out.println("Piece number: " + puzzlePiece.getPieceNumber() + " rotation angle: " + bestRotationAngle);
 
-        //Utilities.writeImageToFile(puzzlePiece.getRotatedImage(), "beforeRotation" + puzzlePiece.getPieceNumber() + ".jpg");
+        System.out.println("Piece number: " + puzzlePiece.getPieceNumber() + " rotation angle: " + bestRotationAngle);
 
         Mat rotatedPiece = ImageRotator.instance.rotate(puzzlePiece.getRotatedImage(), bestRotationAngle);
 
-        cvtColor(rotatedPiece, rotatedPiece, COLOR_RGB2GRAY);
+        double backgroundColor = extractBackgroundColorFrom(puzzlePiece);
 
+        Mat pieceInBinary = binaryQuantizePuzzlePiece(backgroundColor, rotatedPiece);
+
+        //Utilities.writeImageToFile(pieceInBinary, "binary" + puzzlePiece.getPieceNumber() + ".jpg");
+
+        findAndDrawContours(puzzle, pieceMatch, pieceInBinary);
+    }
+
+    private double extractBackgroundColorFrom(PuzzlePiece puzzlePiece)
+    {
         Mat originalInGray = new Mat();
         cvtColor(puzzlePiece.getOriginalSource(), originalInGray, COLOR_RGB2GRAY);
-        double backgroundColor = BackgroundExtractor.instance.calcBackgroundFromSource(originalInGray);
+        return AverageColorCalculator.instance.averageBackgroundOfOneDimension(originalInGray);
+    }
 
-        for (int row = 0; row < rotatedPiece.rows(); row++)
+    private Mat binaryQuantizePuzzlePiece(double backgroundColor, Mat puzzlePiece)
+    {
+        Mat puzzlePieceInBinary = new Mat();
+        cvtColor(puzzlePiece, puzzlePieceInBinary, COLOR_RGB2GRAY);
+
+        for (int row = 0; row < puzzlePieceInBinary.rows(); row++)
         {
-            for (int column = 0; column < rotatedPiece.cols(); column++)
+            for (int column = 0; column < puzzlePieceInBinary.cols(); column++)
             {
-                if (Math.abs(rotatedPiece.get(row, column)[0] - backgroundColor) < 50 || rotatedPiece.get(row, column)[0]<=127)
+                if (Math.abs(puzzlePieceInBinary.get(row, column)[0] - backgroundColor) < 50 || puzzlePieceInBinary.get(row, column)[0] == 0)
                 {
-                    rotatedPiece.put(row, column, 0);
-                }
-                else
+                    puzzlePieceInBinary.put(row, column, 0);
+                } else
                 {
-                    rotatedPiece.put(row, column, 255);
+                    puzzlePieceInBinary.put(row, column, 255);
                 }
             }
-
         }
-        //Utilities.writeImageToFile(rotatedPiece, "binary" + puzzlePiece.getPieceNumber() + ".jpg");
 
-        findContours(rotatedPiece, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE, new Point(0, 0));
+        //delete the rectangle border:
+        for (int row = 0; row < puzzlePieceInBinary.rows(); row++)
+        {
+            for (int column = 0; column < puzzlePieceInBinary.cols(); column++)
+            {
+                if (puzzlePieceInBinary.get(row, column)[0] == 255)
+                {
+                    int down = (row < puzzlePieceInBinary.rows() - 1 && puzzlePieceInBinary.get(row + 1, column)[0] == 0) ? 1 : 0;
+                    int downLeft = (row < puzzlePieceInBinary.rows() - 1 && column > 0 && puzzlePieceInBinary.get(row + 1, column - 1)[0] == 0) ? 1 : 0;
+                    int downRight = (row < puzzlePieceInBinary.rows() - 1 && column < puzzlePieceInBinary.cols() - 1 && puzzlePieceInBinary.get(row + 1, column + 1)[0] == 0) ? 1 : 0;
+                    int up = (row > 0 && puzzlePieceInBinary.get(row - 1, column)[0] == 0) ? 1 : 0;
+                    int upLeft = (row > 0 && column > 0 && puzzlePieceInBinary.get(row - 1, column - 1)[0] == 0) ? 1 : 0;
+                    int upRight = (row > 0 && column < puzzlePieceInBinary.cols() - 1 && puzzlePieceInBinary.get(row - 1, column + 1)[0] == 0) ? 1 : 0;
+                    int right = (column < puzzlePieceInBinary.cols() - 1 && puzzlePieceInBinary.get(row, column + 1)[0] == 0) ? 1 : 0;
+                    int left = (column > 0 && puzzlePieceInBinary.get(row, column - 1)[0] == 0) ? 1 : 0;
 
-        for (int i = 0; i<contours.size(); i++)
+                    int sumOfBlackPixelsAround = down + downLeft + downRight + up + upLeft + upRight + left + right;
+
+                    if (sumOfBlackPixelsAround > 4)
+                    {
+                        puzzlePieceInBinary.put(row, column, 0);
+                    } else
+                    {
+                        puzzlePieceInBinary.put(row, column, 255);
+                    }
+                }
+            }
+        }
+
+        return puzzlePieceInBinary;
+    }
+
+    private void findAndDrawContours(Mat puzzle, Match pieceMatch, Mat binaryPuzzlePiece)
+    {
+        List<MatOfPoint> contours = new ArrayList<>();
+        Mat hierarchy = new Mat();
+        findContours(binaryPuzzlePiece, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE, new Point(0, 0));
+
+        for (int i = 0; i < contours.size(); i++)
         {
             Imgproc.drawContours
                     (
@@ -108,8 +152,7 @@ public enum PuzzleMatchesDrawer
                             0,
                             new Point(pieceMatch.getMatchPoint().x - pieceMatch.getWidth(), pieceMatch.getMatchPoint().y - pieceMatch.getHeight())
                     );
+
         }
-
-
     }
 }
