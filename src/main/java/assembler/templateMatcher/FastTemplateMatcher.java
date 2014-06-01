@@ -2,6 +2,7 @@ package assembler.templateMatcher;
 
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
+import utillities.Utilities;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +32,7 @@ public enum FastTemplateMatcher
         {
             reference = references.get(level);
             tuple = tuples.get(level);
-            result = new Mat(reference.height() - 1 + tuple.height(), reference.width() - 1 + tuple.width(), CvType.CV_32FC1);
+            result = new Mat(reference.height() - tuple.height() + 1, reference.width() - tuple.width() + 1, CvType.CV_32FC1);
 
             if (level == maxLevel)
             {
@@ -61,7 +62,7 @@ public enum FastTemplateMatcher
                     Rect r = boundingRect(contour);
                     matchTemplate
                             (
-                                    reference.submat(r.height, r.height + tuple.height() - 1, r.width, r.width + tuple.width() - 1),
+                                    reference.submat(r.y, r.y + r.height + tuple.height() - 1, r.x, r.x + r.width + tuple.width() - 1),
                                     tuple,
                                     result.submat(r),
                                     TM_CCORR_NORMED
@@ -70,7 +71,7 @@ public enum FastTemplateMatcher
             }
 
             // Only keep good matches
-            threshold(result, result, 0.94, 1., THRESH_TOZERO);
+            threshold(result, result, 0.90, 1., THRESH_TOZERO);
             results.add(result);
         }
 
