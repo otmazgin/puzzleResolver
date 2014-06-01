@@ -15,21 +15,18 @@ enum PuzzlePieceRestorer
 {
     instance;
 
-    private static final int threshold = 30;
+    private static final int threshold = 20;
     private static int epsilon = 10;
 
     void restoreMissingGaps(Mat puzzlePiece, Mat originalPiecesImage)
     {
-        Mat maskOfGaps = new Mat(puzzlePiece.size(), CvType.CV_8U);
-
         Mat originalInGray = new Mat();
         cvtColor(originalPiecesImage, originalInGray, COLOR_RGB2GRAY);
-        //Utilities.writeImageToFile(originalInGray, "grayPieces.jpg");
-        Mat puzzlePieceInGray = new Mat();
-        cvtColor(puzzlePiece, puzzlePieceInGray, COLOR_RGB2GRAY);
-        //Utilities.writeImageToFile(puzzlePieceInGray, "grayPiece.jpg");
-
         double backgroundColor = AverageColorCalculator.instance.averageBackgroundOfOneDimension(originalInGray);
+
+        Mat puzzlePieceInGray = new Mat();
+        Mat maskOfGaps = new Mat(puzzlePiece.size(), CvType.CV_8U);
+        cvtColor(puzzlePiece, puzzlePieceInGray, COLOR_RGB2GRAY);
 
         fillMaskAtLeftGap(puzzlePieceInGray, backgroundColor, maskOfGaps);
         fillMaskAtRightGap(puzzlePieceInGray, backgroundColor, maskOfGaps);
@@ -38,7 +35,13 @@ enum PuzzlePieceRestorer
 
         inpaint(puzzlePiece, maskOfGaps, puzzlePiece, 1, INPAINT_TELEA);
 
-        Utilities.writeImageToFile(puzzlePiece, "inpainted" + (int) (100 * Math.random()) + ".jpg");
+        /*
+        Utilities.drawPoint(new org.opencv.core.Point(60, puzzlePieceInGray.height() / 2), puzzlePiece);
+        Utilities.drawPoint(new org.opencv.core.Point(puzzlePieceInGray.width() - 60, puzzlePieceInGray.height() / 2), puzzlePiece);
+        Utilities.drawPoint(new org.opencv.core.Point(puzzlePieceInGray.width() / 2, 60), puzzlePiece);
+        Utilities.drawPoint(new org.opencv.core.Point(puzzlePieceInGray.width() / 2, puzzlePieceInGray.height() - 60), puzzlePiece);
+        */
+        //Utilities.writeImageToFile(puzzlePiece, "inpainted" + (int) (100 * Math.random()) + ".jpg");
     }
 
 

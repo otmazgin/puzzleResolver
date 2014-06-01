@@ -26,14 +26,30 @@ public enum AverageColorCalculator
                 (
                         image,
                         1,
+                        new Point(center.x - 2, center.y - 2),
+                        new Point(center.x - 2, center.y - 1),
+                        new Point(center.x - 2, center.y),
+                        new Point(center.x - 2, center.y + 1),
+                        new Point(center.x - 2, center.y + 2),
+                        new Point(center.x - 1, center.y - 2),
                         new Point(center.x - 1, center.y - 1),
                         new Point(center.x - 1, center.y),
                         new Point(center.x - 1, center.y + 1),
+                        new Point(center.x - 1, center.y + 2),
+                        new Point(center.x, center.y - 2),
                         new Point(center.x, center.y - 1),
                         new Point(center.x, center.y + 1),
+                        new Point(center.x, center.y + 2),
+                        new Point(center.x + 1, center.y - 2),
                         new Point(center.x + 1, center.y - 1),
                         new Point(center.x + 1, center.y),
-                        new Point(center.x + 1, center.y + 1)
+                        new Point(center.x + 1, center.y + 1),
+                        new Point(center.x + 1, center.y + 2),
+                        new Point(center.x + 2, center.y - 2),
+                        new Point(center.x + 2, center.y - 1),
+                        new Point(center.x + 2, center.y),
+                        new Point(center.x + 2, center.y + 1),
+                        new Point(center.x + 2, center.y + 2)
                 );
 
         return average[0];
